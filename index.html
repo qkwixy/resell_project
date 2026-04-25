@@ -146,7 +146,7 @@
 
     <div class="top-bar">
         <div class="brand">CULTBASE</div>
-        <a href="https://t.me/resell_culture" class="tg-link">
+        <a href="https://t.me/resell_cult" class="tg-link">
             <span>📢 Канал</span>
         </a>
     </div>
@@ -267,7 +267,12 @@
             await fetch(`${API_URL}/api/report`, { method: 'POST', headers, body: JSON.stringify({user_id: USER_ID}) });
             tg.showPopup({ title: "Отправка", message: "Отчет PIT-36 формируется и придет в чат через секунду." });
         }
-
+        // ФИКС БАГА С КЛАВИАТУРОЙ
+        const navBar = document.querySelector('.navbar');
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => { navBar.style.display = 'none'; });
+            input.addEventListener('blur', () => { setTimeout(() => navBar.style.display = 'flex', 100); });
+        });
         loadStock();
     </script>
 </body>
