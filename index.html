@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CultBase</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -12,19 +12,23 @@
         .top-bar { background: rgba(28, 28, 30, 0.8); backdrop-filter: blur(20px); padding: 15px 20px; display: flex; justify-content: space-between; position: sticky; top: 0; z-index: 100; border-bottom: 0.5px solid #38383a; font-weight: 800; font-size: 20px; }
         .tg-link { background: #2481cc; color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         
-        .container { padding: 16px; }
+        .container { padding: 20px; }
         .card { background: var(--card-bg); border-radius: 18px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border: 0.5px solid #38383a; cursor: pointer; }
         .card-icon { width: 50px; height: 50px; background: #2c2c2e; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
-        .card-name { font-weight: 600; font-size: 16px; }
-        .card-price { color: var(--accent); font-weight: 700; font-size: 14px; margin-top: 4px; }
-        .qty-badge { background: #333; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+        .card-name { font-weight: 600; font-size: 18px; margin-bottom: 4px;}
+        .card-price { color: var(--accent); font-weight: 700; font-size: 15px; }
+        .qty-badge { background: #333; color: #fff; font-size: 12px; padding: 4px 8px; border-radius: 10px; margin-left: 8px; }
 
-        label { font-size: 12px; color: var(--sub); text-transform: uppercase; margin-left: 4px; }
-        input, select { width: 100%; background: #1c1c1e; border: none; padding: 15px; border-radius: 14px; color: #fff; font-size: 16px; margin: 6px 0 16px; box-sizing: border-box; }
-        .btn { background: var(--accent); color: #fff; border: none; width: 100%; padding: 16px; border-radius: 16px; font-weight: 700; font-size: 16px; }
+        /* НОВЫЙ ДИЗАЙН ФОРМ: ОГРОМНЫЕ И ПОНЯТНЫЕ */
+        .form-block { margin-bottom: 20px; }
+        label { display: block; font-size: 13px; color: var(--sub); text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+        input, select { width: 100%; background: var(--card-bg); border: 1px solid #38383a; padding: 18px; border-radius: 16px; color: #fff; font-size: 18px; box-sizing: border-box; outline: none; }
+        input:focus, select:focus { border-color: var(--accent); }
         
-        .navbar { position: fixed; bottom: 25px; left: 20px; right: 20px; background: rgba(28,28,30,0.95); backdrop-filter: blur(15px); border-radius: 25px; display: flex; padding: 8px; z-index: 1000; border: 0.5px solid #38383a; transition: transform 0.3s; }
-        .nav-item { flex: 1; text-align: center; padding: 10px; color: var(--sub); font-size: 11px; border-radius: 18px; }
+        .btn { background: var(--accent); color: #fff; border: none; width: 100%; padding: 18px; border-radius: 16px; font-weight: 700; font-size: 18px; margin-top: 10px; cursor: pointer; }
+        
+        .navbar { position: fixed; bottom: 25px; left: 20px; right: 20px; background: rgba(28,28,30,0.95); backdrop-filter: blur(15px); border-radius: 25px; display: flex; padding: 8px; z-index: 1000; border: 0.5px solid #38383a; }
+        .nav-item { flex: 1; text-align: center; padding: 12px; color: var(--sub); font-size: 12px; font-weight: 600; border-radius: 18px; }
         .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; }
         
         .tab { display: none; } .tab.active { display: block; }
@@ -43,30 +47,24 @@
         </div>
 
         <div id="tab-add" class="tab">
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
-                    <label>Категория</label>
-                    <select id="icon">
-                        <option value="👟">👟 Обувь</option>
-                        <option value="👕">👕 Одежда</option>
-                        <option value="🧢">🧢 Аксессуар</option>
-                        <option value="📦">📦 Другое</option>
+            
+            <div class="form-block">
+                <label>Что за вещь?</label>
+                <div style="display: flex; gap: 10px;">
+                    <select id="icon" style="width: 30%;">
+                        <option value="👟">👟</option>
+                        <option value="👕">👕</option>
+                        <option value="🧢">🧢</option>
                     </select>
-                </div>
-                <div style="flex: 2;">
-                    <label>Название</label>
-                    <input type="text" id="name" placeholder="Nike Dunk Low">
+                    <input type="text" id="name" placeholder="Например: Nike Dunk" style="width: 70%;">
                 </div>
             </div>
-            
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 2;">
-                    <label>Цена за 1 шт.</label>
-                    <input type="number" id="price" placeholder="0.00">
-                </div>
-                <div style="flex: 1;">
-                    <label>Валюта</label>
-                    <select id="currency">
+
+            <div class="form-block">
+                <label>Цена за 1 штуку</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="price" placeholder="0.00" style="width: 60%;">
+                    <select id="currency" style="width: 40%;">
                         <option value="PLN">PLN</option>
                         <option value="EUR">EUR</option>
                         <option value="CNY">CNY</option>
@@ -74,25 +72,23 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
-                    <label>Кол-во</label>
-                    <input type="number" id="qty" value="1" min="1">
-                </div>
-                <div style="flex: 2;">
-                    <label>Общая доставка (PLN)</label>
-                    <input type="number" id="ship" placeholder="0.00">
+            <div class="form-block">
+                <label>Доставка (PLN) + Количество</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="ship" placeholder="Доставка" style="width: 60%;">
+                    <input type="number" id="qty" placeholder="Шт." value="1" min="1" style="width: 40%;">
                 </div>
             </div>
-            <button class="btn" onclick="saveItem()">📦 Добавить на склад</button>
+
+            <button class="btn" id="add-btn" onclick="saveItem()">Добавить на склад</button>
         </div>
 
         <div id="tab-stats" class="tab">
-            <div class="card" style="flex-direction: column; align-items: flex-start;">
-                <div style="color: var(--sub); font-size: 12px;">ОБЩИЙ КАПИТАЛ НА СКЛАДЕ</div>
-                <div style="font-size: 28px; font-weight: 800;" id="total-val">0.00 zł</div>
+            <div class="card" style="flex-direction: column; align-items: flex-start; padding: 25px;">
+                <div style="color: var(--sub); font-size: 13px; font-weight: 600; margin-bottom: 8px;">ДЕНЕГ В ТОВАРЕ</div>
+                <div style="font-size: 34px; font-weight: 800;" id="total-val">0.00 zł</div>
             </div>
-            <button class="btn" style="background: #2c2c2e;" onclick="getReport()">📊 Скачать PIT-36</button>
+            <button class="btn" style="background: #2c2c2e; margin-top: 20px;" onclick="getReport()">📊 Сформировать PIT-36</button>
         </div>
     </div>
 
@@ -105,22 +101,17 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.backgroundColor = '#000000';
         
-        // ❗️ ВАЖНО: 100% ФИКС КЛАВИАТУРЫ ДЛЯ IOS ТЕЛЕГРАМА ❗️
-        if (window.visualViewport) {
-            const nav = document.getElementById('nav');
-            window.visualViewport.addEventListener('resize', () => {
-                if (window.visualViewport.height < window.innerHeight - 100) {
-                    nav.style.transform = 'translateY(150px)'; // Прячем вниз
-                } else {
-                    nav.style.transform = 'translateY(0)'; // Возвращаем
-                }
-            });
-        }
+        // РАДИКАЛЬНЫЙ ФИКС КЛАВИАТУРЫ (ПРОСТО УБИВАЕМ МЕНЮ)
+        const nav = document.getElementById('nav');
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('focus', () => nav.style.display = 'none');
+            el.addEventListener('blur', () => setTimeout(() => nav.style.display = 'flex', 100));
+        });
 
+        // БЕРЕМ ID ИЗ САМОГО ТЕЛЕГРАМА НАПРЯМУЮ, ЧТОБЫ КНОПКА ТОЧНО РАБОТАЛА
+        const USER_ID = tg.initDataUnsafe?.user?.id || new URLSearchParams(window.location.search).get('user_id');
         const API_URL = "https://sierra-stopped-gizmo.ngrok-free.dev"; 
-        const USER_ID = new URLSearchParams(window.location.search).get('user_id');
         const headers = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' };
 
         function switchTab(id, el) {
@@ -132,13 +123,14 @@
         }
 
         async function loadStock() {
+            if (!USER_ID) return;
             const res = await fetch(`${API_URL}/api/stock?user_id=${USER_ID}`, { headers });
             const items = await res.json();
             const list = document.getElementById('stock-list');
             let total = 0;
             
             if (!items.length) {
-                list.innerHTML = '<div style="text-align:center; padding:50px; color:#8e8e93;">Склад пуст</div>';
+                list.innerHTML = '<div style="text-align:center; padding:50px; color:#8e8e93;">На складе пока пусто.</div>';
                 document.getElementById('total-val').innerText = '0.00 zł';
                 return;
             }
@@ -151,7 +143,7 @@
                     <div class="card-icon">${i.icon}</div>
                     <div style="flex:1">
                         <div class="card-name">${i.name} <span class="qty-badge">${i.qty} шт</span></div>
-                        <div class="card-price">Себес: ${i.price.toFixed(1)} PLN/шт</div>
+                        <div class="card-price">Себестоимость: ${i.price.toFixed(1)} zł</div>
                     </div>
                 </div>`;
             });
@@ -159,32 +151,46 @@
         }
 
         async function saveItem() {
+            if (!USER_ID) return tg.showAlert("Ошибка: Телеграм не передал твой ID.");
+            
+            const btn = document.getElementById('add-btn');
             const data = {
                 user_id: USER_ID, icon: document.getElementById('icon').value,
                 name: document.getElementById('name').value, price: document.getElementById('price').value,
                 currency: document.getElementById('currency').value, qty: document.getElementById('qty').value || 1,
                 ship: document.getElementById('ship').value || 0
             };
+            
             if(!data.name || !data.price) return tg.showAlert("Заполни название и цену!");
             
-            await fetch(`${API_URL}/api/add`, { method: 'POST', headers, body: JSON.stringify(data) });
-            tg.HapticFeedback.notificationOccurred('success');
-            document.getElementById('name').value = ''; document.getElementById('price').value = '';
-            loadStock(); switchTab('tab-stock', document.querySelectorAll('.nav-item')[0]);
+            btn.innerText = "⏳ Загрузка...";
+            
+            try {
+                const res = await fetch(`${API_URL}/api/add`, { method: 'POST', headers, body: JSON.stringify(data) });
+                if(res.ok) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                    document.getElementById('name').value = ''; 
+                    document.getElementById('price').value = '';
+                    document.getElementById('ship').value = '';
+                    document.getElementById('qty').value = '1';
+                    loadStock(); 
+                    switchTab('tab-stock', document.querySelectorAll('.nav-item')[0]);
+                } else {
+                    tg.showAlert("Ошибка базы данных. Ты удалил старую базу?");
+                }
+            } catch(e) {
+                tg.showAlert("Сервер не отвечает. ngrok включен?");
+            }
+            btn.innerText = "Добавить на склад";
         }
 
-        // ПОПАП ПРОДАЖИ
         function sellItem(id, name, cost) {
             tg.showPopup({
                 title: "Продажа товара",
-                message: `За сколько PLN продаем ${name}? (Себестоимость: ${cost.toFixed(1)})`,
-                buttons: [{id: "sell", type: "default", text: "Продать (Ввести цену)"}, {type: "cancel"}]
+                message: `Нажми 'Продать', чтобы списать ${name}. Себестоимость: ${cost.toFixed(1)} zł`,
+                buttons: [{id: "sell", type: "default", text: "Списать со склада"}, {type: "cancel"}]
             }, (btnId) => {
-                if (btnId === "sell") {
-                    // ТГ WebApp не поддерживает input в popup, поэтому шлем сигнал боту или ставим заглушку. 
-                    // Для простоты продаем с наценкой x1.5 (позже сделаем кастомный ввод)
-                    confirmSale(id, cost * 1.5); 
-                }
+                if (btnId === "sell") confirmSale(id, cost * 1.5); // Пока тестовая продажа +50% 
             });
         }
 
@@ -195,8 +201,14 @@
         }
 
         async function getReport() {
-            await fetch(`${API_URL}/api/report`, { method: 'POST', headers, body: JSON.stringify({user_id: USER_ID}) });
-            tg.showPopup({ message: "Отчет отправлен в чат!" });
+            const res = await fetch(`${API_URL}/api/report`, { method: 'POST', headers, body: JSON.stringify({user_id: USER_ID}) });
+            const data = await res.json();
+            
+            if (data.status === "empty") {
+                tg.showAlert("❌ У тебя еще нет проданных товаров для отчета!");
+            } else {
+                tg.showPopup({ message: "✅ Отчет отправлен тебе в личные сообщения!" });
+            }
         }
 
         loadStock();
