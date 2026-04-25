@@ -6,185 +6,147 @@
     <title>CultBase</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --bg: var(--tg-theme-bg-color, #ffffff);
-            --sec-bg: var(--tg-theme-secondary-bg-color, #f4f4f7);
-            --text: var(--tg-theme-text-color, #222);
-            --hint: var(--tg-theme-hint-color, #8e8e93);
-            --link: var(--tg-theme-link-color, #2481cc);
-            --btn-bg: var(--tg-theme-button-color, #2481cc);
-            --btn-text: var(--tg-theme-button-text-color, #ffffff);
-        }
+        :root { --accent: #2481cc; --bg: var(--tg-theme-bg-color, #fff); --sec-bg: var(--tg-theme-secondary-bg-color, #f4f4f7); --text: var(--tg-theme-text-color, #000); }
+        body { font-family: -apple-system, sans-serif; background: var(--sec-bg); color: var(--text); margin: 0; padding-bottom: 80px; }
+        
+        .header { background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); padding: 15px 20px; font-weight: bold; font-size: 18px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 5px rgba(0,0,0,0.05); color: #000; }
+        
+        .tab-content { display: none; padding: 15px; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            background-color: var(--sec-bg);
-            color: var(--text);
-            margin: 0; padding: 0; padding-bottom: 90px;
-            user-select: none;
-        }
+        .card { background: var(--bg); border-radius: 16px; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .img { font-size: 30px; background: var(--sec-bg); border-radius: 12px; padding: 10px; }
+        .title { font-weight: bold; margin-bottom: 4px; }
+        .price { color: #888; font-size: 14px; }
 
-        .header {
-            background: var(--bg);
-            padding: 16px 20px;
-            position: sticky; top: 0; z-index: 10;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            font-weight: bold;
-            font-size: 18px;
-        }
+        input, select { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 1px solid #ddd; background: var(--bg); color: var(--text); font-size: 16px; box-sizing: border-box; }
+        .btn { background: var(--accent); color: #fff; width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        .container { padding: 12px; }
-
-        .card {
-            background: var(--bg);
-            border-radius: 16px;
-            padding: 12px; margin-bottom: 12px;
-            display: flex; align-items: center;
-            gap: 12px; transition: transform 0.1s;
-        }
-        .card:active { transform: scale(0.98); }
-
-        .img-placeholder {
-            width: 50px; height: 50px;
-            background: var(--sec-bg);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center; font-size: 24px;
-        }
-
-        .info { flex: 1; }
-        .title { font-weight: 700; font-size: 16px; margin-bottom: 2px; }
-        .price { font-size: 14px; color: var(--hint); }
-
-        .status-tag {
-            font-size: 10px; font-weight: 800;
-            padding: 3px 8px; border-radius: 6px;
-            text-transform: uppercase;
-        }
-        .status-stock { background: #e1f5fe; color: #039be5; }
-
-        .checkbox {
-            width: 22px; height: 22px;
-            border: 2px solid var(--hint);
-            border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .card.selected .checkbox {
-            background: var(--link);
-            border-color: var(--link);
-        }
-        .card.selected .checkbox::after {
-            content: '✓'; color: white; font-size: 14px;
-        }
-
-        .nav {
-            position: fixed; bottom: 0; width: 100%;
-            background: var(--bg);
-            display: flex; justify-content: space-around;
-            padding: 10px 0 25px; border-top: 1px solid rgba(0,0,0,0.05);
-        }
-        .nav-btn { text-align: center; color: var(--hint); font-size: 11px; flex: 1; cursor: pointer; }
-        .nav-btn.active { color: var(--link); }
-        .nav-icon { display: block; font-size: 22px; margin-bottom: 4px; }
-
-        .main-btn {
-            position: fixed; bottom: 85px; left: 12px; right: 12px;
-            background: var(--btn-bg);
-            color: var(--btn-text);
-            padding: 14px; border-radius: 14px;
-            text-align: center; font-weight: 700;
-            display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            cursor: pointer;
-        }
+        .nav { position: fixed; bottom: 0; width: 100%; background: var(--bg); display: flex; justify-content: space-around; padding: 10px 0 25px; box-shadow: 0 -1px 10px rgba(0,0,0,0.05); }
+        .nav-btn { text-align: center; color: #888; font-size: 11px; cursor: pointer; flex: 1; }
+        .nav-btn.active { color: var(--accent); }
+        .icon { display: block; font-size: 24px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <span>🏎 CultBase</span>
-        <span id="stats" style="font-size: 12px; color: var(--hint);">0 выбрано</span>
+    <div class="header">🏎 CultBase</div>
+
+    <div id="tab-stock" class="tab-content active">
+        <h3 style="margin-top:0;">Склад</h3>
+        <div id="stock-list">Загрузка...</div>
     </div>
 
-    <div class="container" id="app">
-        <div style="text-align:center; margin-top:20px; color:var(--hint);">Загрузка склада...</div>
+    <div id="tab-add" class="tab-content">
+        <h3 style="margin-top:0;">Добавить товар</h3>
+        <input type="text" id="name" placeholder="Название (например, Nike Dunk)">
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="price" placeholder="Цена">
+            <select id="currency">
+                <option value="PLN">PLN (Злотый)</option>
+                <option value="EUR">EUR (Евро)</option>
+                <option value="CNY">CNY (Юань)</option>
+            </select>
+        </div>
+        <input type="number" id="ship" placeholder="Доставка (PLN)">
+        <button class="btn" onclick="addItem()">📦 Сохранить на склад</button>
     </div>
-
-    <div class="main-btn" id="actionBtn" onclick="sendToBot()">Продать выбранное</div>
 
     <div class="nav">
-        <div class="nav-btn active"><span class="nav-icon">📦</span>Склад</div>
-        <div class="nav-btn" onclick="sendCommand('import_excel')"><span class="nav-icon">➕</span>Закуп</div>
-        <div class="nav-btn" onclick="sendCommand('export_pit36')"><span class="nav-icon">📊</span>PIT-36</div>
+        <div class="nav-btn active" onclick="switchTab('tab-stock', this); loadStock();"><span class="icon">📦</span>Склад</div>
+        <div class="nav-btn" onclick="switchTab('tab-add', this)"><span class="icon">➕</span>Закуп</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         
-        let selectedItems = [];
+        // ВАЖНО: ВСТАВЬ СЮДА СВОЮ ССЫЛКУ ОТ NGROK
+        const API_URL = "https://sierra-stopped-gizmo.ngrok-free.app"; 
+        
+        // Достаем ID пользователя из ссылки
+        const urlParams = new URLSearchParams(window.location.search);
+        const USER_ID = urlParams.get('user_id');
 
-        // Отправка простых команд (Закуп, PIT-36)
-        function sendCommand(cmd) {
-            tg.sendData(JSON.stringify({ action: cmd }));
+        // Эти заголовки нужны для обхода экрана предупреждения ngrok
+        const reqHeaders = { 
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true' 
+        };
+
+        function switchTab(id, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
         }
 
-        // Читаем данные, которые прислал бот в ссылке
-        const urlParams = new URLSearchParams(window.location.search);
-        const dataParam = urlParams.get('data');
-        const appDiv = document.getElementById('app');
-
-        if (dataParam) {
-            const stockData = JSON.parse(decodeURIComponent(dataParam));
-            appDiv.innerHTML = ''; 
-            
-            if (stockData.length === 0) {
-                appDiv.innerHTML = '<div style="text-align:center; margin-top:20px; color:var(--hint);">Склад пуст. Нажми "Закуп" внизу.</div>';
-            } else {
-                stockData.forEach(item => {
-                    appDiv.innerHTML += `
-                    <div class="card" onclick="toggleSelect(this, ${item.id})">
-                        <div class="img-placeholder">📦</div>
-                        <div class="info">
-                            <div class="title">${item.name}</div>
-                            <div class="price">${item.price.toFixed(0)} zł <span class="status-tag status-stock">На складе</span></div>
+        async function loadStock() {
+            if(!USER_ID) return;
+            const list = document.getElementById('stock-list');
+            try {
+                const res = await fetch(`${API_URL}/api/stock?user_id=${USER_ID}`, { headers: reqHeaders });
+                const items = await res.json();
+                
+                if (items.length === 0) {
+                    list.innerHTML = '<div style="color:#888; text-align:center;">Пусто. Добавь товар во вкладке "Закуп".</div>';
+                    return;
+                }
+                
+                list.innerHTML = '';
+                items.forEach(i => {
+                    list.innerHTML += `
+                    <div class="card">
+                        <div class="img">👟</div>
+                        <div>
+                            <div class="title">${i.name}</div>
+                            <div class="price">${i.price.toFixed(0)} PLN</div>
                         </div>
-                        <div class="checkbox"></div>
                     </div>`;
                 });
+            } catch (e) {
+                list.innerHTML = '<div style="color:red;">Ошибка связи с сервером!</div>';
             }
         }
 
-        function toggleSelect(el, id) {
-            el.classList.toggle('selected');
-            if (el.classList.contains('selected')) {
-                selectedItems.push(id);
-            } else {
-                selectedItems = selectedItems.filter(i => i !== id);
-            }
-            updateUI();
-        }
-
-        function updateUI() {
-            const btn = document.getElementById('actionBtn');
-            const stats = document.getElementById('stats');
-            if (selectedItems.length > 0) {
-                btn.style.display = 'block';
-                btn.innerText = `Продать (${selectedItems.length})`;
-                stats.innerText = `${selectedItems.length} выбрано`;
-            } else {
-                btn.style.display = 'none';
-                stats.innerText = '0 выбрано';
-            }
-        }
-
-        // Отправка данных о продаже
-        function sendToBot() {
-            let data = {
-                action: 'sell_multi',
-                ids: selectedItems
+        async function addItem() {
+            const data = {
+                user_id: USER_ID,
+                name: document.getElementById('name').value,
+                price: document.getElementById('price').value,
+                currency: document.getElementById('currency').value,
+                ship: document.getElementById('ship').value || 0
             };
-            tg.sendData(JSON.stringify(data)); 
+            
+            if(!data.name || !data.price) return tg.showAlert("Заполни название и цену!");
+
+            const btn = document.querySelector('.btn');
+            btn.innerText = "⏳ Сохранение...";
+            
+            try {
+                const res = await fetch(`${API_URL}/api/add`, { 
+                    method: 'POST', 
+                    headers: reqHeaders, 
+                    body: JSON.stringify(data) 
+                });
+                
+                if(res.ok) {
+                    tg.showAlert("✅ Товар успешно добавлен!");
+                    document.getElementById('name').value = '';
+                    document.getElementById('price').value = '';
+                    document.getElementById('ship').value = '';
+                    switchTab('tab-stock', document.querySelectorAll('.nav-btn')[0]);
+                    loadStock();
+                }
+            } catch (e) {
+                tg.showAlert("❌ Ошибка сервера!");
+            }
+            btn.innerText = "📦 Сохранить на склад";
         }
+
+        // Загружаем склад при старте
+        loadStock();
     </script>
 </body>
 </html>
