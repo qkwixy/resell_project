@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CultBase Pro</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg: var(--tg-theme-bg-color, #ffffff);
+            --sec-bg: var(--tg-theme-secondary-bg-color, #f4f4f7);
+            --text: var(--tg-theme-text-color, #222);
+            --hint: var(--tg-theme-hint-color, #8e8e93);
+            --link: var(--tg-theme-link-color, #2481cc);
+            --btn-bg: var(--tg-theme-button-color, #2481cc);
+            --btn-text: var(--tg-theme-button-text-color, #ffffff);
+        }
+
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: var(--sec-bg);
+            color: var(--text);
+            margin: 0; padding: 0; padding-bottom: 90px;
+            user-select: none;
+        }
+
+        .header {
+            background: var(--bg);
+            padding: 16px 20px;
+            position: sticky; top: 0; z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .container { padding: 12px; }
+
+        /* Карточки */
+        .card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 12px; margin-bottom: 12px;
+            display: flex; align-items: center;
+            gap: 12px; transition: transform 0.1s;
+        }
+        .card:active { transform: scale(0.98); }
+
+        .img-placeholder {
+            width: 50px; height: 50px;
+            background: var(--sec-bg);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+        }
+
+        .info { flex: 1; }
+        .title { font-weight: 700; font-size: 16px; margin-bottom: 2px; }
+        .price { font-size: 14px; color: var(--hint); }
+
+        .status-tag {
+            font-size: 10px; font-weight: 800;
+            padding: 3px 8px; border-radius: 6px;
+            text-transform: uppercase;
+        }
+        .status-stock { background: #e1f5fe; color: #039be5; }
+
+        /* Чекбокс */
+        .checkbox {
+            width: 22px; height: 22px;
+            border: 2px solid var(--hint);
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .card.selected .checkbox {
+            background: var(--link);
+            border-color: var(--link);
+        }
+        .card.selected .checkbox::after {
+            content: '✓'; color: white; font-size: 14px;
+        }
+
+        /* Навигация */
+        .nav {
+            position: fixed; bottom: 0; width: 100%;
+            background: var(--bg);
+            display: flex; justify-content: space-around;
+            padding: 10px 0 25px; border-top: 1px solid rgba(0,0,0,0.05);
+        }
+        .nav-btn { text-align: center; color: var(--hint); font-size: 11px; flex: 1; }
+        .nav-btn.active { color: var(--link); }
+        .nav-icon { display: block; font-size: 22px; margin-bottom: 4px; }
+
+        /* Кнопка действия */
+        .main-btn {
+            position: fixed; bottom: 85px; left: 12px; right: 12px;
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            padding: 14px; border-radius: 14px;
+            text-align: center; font-weight: 700;
+            display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <span>🏎 CultBase</span>
+        <span id="stats" style="font-size: 12px; color: var(--hint);">0 выбрано</span>
+    </div>
+
+    <div class="container" id="app">
+        <div class="card" onclick="toggleSelect(this, 1)">
+            <div class="img-placeholder">👟</div>
+            <div class="info">
+                <div class="title">Nike TN Air Max</div>
+                <div class="price">450 zł <span class="status-tag status-stock">На складе</span></div>
+            </div>
+            <div class="checkbox"></div>
+        </div>
+
+        <div class="card" onclick="toggleSelect(this, 2)">
+            <div class="img-placeholder">🧥</div>
+            <div class="info">
+                <div class="title">Stone Island Ghost</div>
+                <div class="price">1250 zł <span class="status-tag status-stock">На складе</span></div>
+            </div>
+            <div class="checkbox"></div>
+        </div>
+    </div>
+
+    <div class="main-btn" id="actionBtn" onclick="sendToBot()">Продать выбранное</div>
+
+    <div class="nav">
+        <div class="nav-btn active"><span class="nav-icon">📦</span>Склад</div>
+        <div class="nav-btn"><span class="nav-icon">➕</span>Закуп</div>
+        <div class="nav-btn"><span class="nav-icon">📊</span>PIT-36</div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        let selectedItems = [];
+
+        function toggleSelect(el, id) {
+            el.classList.toggle('selected');
+            if (el.classList.contains('selected')) {
+                selectedItems.push(id);
+            } else {
+                selectedItems = selectedItems.filter(i => i !== id);
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            const btn = document.getElementById('actionBtn');
+            const stats = document.getElementById('stats');
+            if (selectedItems.length > 0) {
+                btn.style.display = 'block';
+                btn.innerText = `Продать (${selectedItems.length})`;
+                stats.innerText = `${selectedItems.length} выбрано`;
+            } else {
+                btn.style.display = 'none';
+                stats.innerText = '0 выбрано';
+            }
+        }
+
+        function sendToBot() {
+            // ФОРМИРУЕМ ДАННЫЕ ДЛЯ ОТПРАВКИ В PYTHON
+            let data = {
+                action: 'sell_multi',
+                ids: selectedItems
+            };
+            tg.sendData(JSON.stringify(data)); // Отправляем JSON боту и закрываем окно
+        }
+    </script>
+</body>
+</html>
