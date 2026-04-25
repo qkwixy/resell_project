@@ -3,160 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CultBase Pro</title>
+    <title>CultBase V1.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* Цветовая палитра: опора на системные цвета ТГ + премиум акценты */
-        :root { 
-            --accent: #007aff; 
-            --bg: var(--tg-theme-bg-color, #ffffff); 
-            --sec-bg: var(--tg-theme-secondary-bg-color, #f2f2f7); 
-            --text: var(--tg-theme-text-color, #000000);
-            --hint: var(--tg-theme-hint-color, #8e8e93);
-        }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--sec-bg); 
-            color: var(--text); 
-            margin: 0; 
-            padding-bottom: 100px; /* Место под плавающий навбар */
-            -webkit-font-smoothing: antialiased;
+        :root {
+            --accent: #007aff;
+            --bg: #000000;
+            --card-bg: #1c1c1e;
+            --text: #ffffff;
+            --secondary-text: #8e8e93;
         }
 
-        /* Заголовок с эффектом стекла */
-        .header { 
-            background: rgba(var(--bg), 0.7); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-            padding: 16px 20px; 
-            font-weight: 800; 
-            font-size: 22px; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            border-bottom: 1px solid rgba(142, 142, 147, 0.1);
+        body {
+            font-family: -apple-system, system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0; padding: 0;
+            padding-bottom: 100px;
+            overflow-x: hidden;
+        }
+
+        /* ШАПКА С ТГ КАНАЛОМ */
+        .top-bar {
+            background: rgba(28, 28, 30, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+            border-bottom: 0.5px solid #38383a;
+        }
+
+        .brand { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
+        
+        .tg-link {
+            background: #2481cc;
+            color: white;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
         }
 
         .container { padding: 16px; }
+
+        /* КАРТОЧКИ СКЛАДА */
+        .card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 0.5px solid #38383a;
+        }
+
+        .card-img {
+            width: 50px; height: 50px;
+            background: #2c2c2e;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+        }
+
+        .card-info { flex: 1; }
+        .card-name { font-weight: 600; font-size: 16px; margin-bottom: 2px; }
+        .card-price { color: var(--accent); font-weight: 700; font-size: 14px; }
+
+        /* ФОРМЫ */
+        .input-group { margin-bottom: 15px; }
+        label { font-size: 12px; color: var(--secondary-text); margin-left: 5px; text-transform: uppercase; }
         
-        .tab-content { display: none; animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .tab-content.active { display: block; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Карточки товаров */
-        .card { 
-            background: var(--bg); 
-            border-radius: 20px; 
-            padding: 16px; 
-            margin-bottom: 14px; 
-            display: flex; 
-            align-items: center; 
-            gap: 16px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04); 
-            transition: transform 0.2s;
+        input, select {
+            width: 100%;
+            background: #1c1c1e;
+            border: none;
+            padding: 15px;
+            border-radius: 14px;
+            color: white;
+            font-size: 16px;
+            margin-top: 5px;
+            box-sizing: border-box;
         }
-        .card:active { transform: scale(0.97); }
-        .img-box { 
-            font-size: 28px; 
-            background: var(--sec-bg); 
-            border-radius: 14px; 
-            width: 56px; height: 56px; 
-            display: flex; align-items: center; justify-content: center; 
-        }
-        .title { font-weight: 700; font-size: 17px; margin-bottom: 4px; }
-        .price { color: var(--accent); font-weight: 600; font-size: 15px; }
 
-        /* Премиум формы */
-        .form-group { margin-bottom: 16px; }
-        .form-label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--hint); text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        input, select { 
-            width: 100%; 
-            padding: 16px; 
-            border-radius: 16px; 
-            border: none; 
-            background: var(--bg); 
-            color: var(--text); 
-            font-size: 16px; 
-            box-sizing: border-box; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            appearance: none;
-            outline: none;
+        .btn-action {
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 10px;
         }
-        input:focus, select:focus { box-shadow: 0 0 0 2px var(--accent); }
 
-        .btn { 
-            background: var(--accent); 
-            color: #fff; 
-            width: 100%; 
-            padding: 16px; 
-            border-radius: 16px; 
-            border: none; 
-            font-size: 17px; 
-            font-weight: 700; 
-            cursor: pointer; 
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-            transition: opacity 0.2s;
-        }
-        .btn:active { opacity: 0.8; }
-
-        /* Плавающий навбар */
-        .floating-nav { 
-            position: fixed; 
-            bottom: 24px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            background: rgba(30, 30, 30, 0.85); 
+        /* НИЖНИЙ НАВБАР */
+        .navbar {
+            position: fixed; bottom: 25px;
+            left: 20px; right: 20px;
+            background: rgba(28, 28, 30, 0.95);
             backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            display: flex; 
-            border-radius: 30px; 
-            padding: 6px; 
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-            z-index: 1000;
+            border-radius: 25px;
+            display: flex;
+            padding: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 0.5px solid #38383a;
         }
-        .nav-item { 
-            color: #a1a1aa; 
-            padding: 10px 24px; 
-            border-radius: 24px; 
-            font-size: 14px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.3s ease;
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            color: var(--secondary-text);
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: 18px;
+            transition: 0.2s;
         }
-        .nav-item.active { background: #ffffff; color: #000000; }
-        
-        .error-msg { color: #ff3b30; text-align: center; padding: 20px; font-weight: 600; background: var(--bg); border-radius: 16px;}
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+
+        .nav-icon { display: block; font-size: 20px; margin-bottom: 2px; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: slideUp 0.3s ease-out; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="header">🏎 CultBase</div>
+    <div class="top-bar">
+        <div class="brand">CULTBASE</div>
+        <a href="https://t.me/resell_culture" class="tg-link">
+            <span>📢 Канал</span>
+        </a>
+    </div>
 
     <div class="container">
         <div id="tab-stock" class="tab-content active">
-            <div id="stock-list">
-                <div style="text-align: center; color: var(--hint); padding: 40px 0;">Загрузка данных...</div>
-            </div>
+            <div id="stock-list">Загрузка данных...</div>
         </div>
 
         <div id="tab-add" class="tab-content">
-            <div class="form-group">
-                <label class="form-label">Что купили?</label>
-                <input type="text" id="name" placeholder="Например: Yeezy Boost 350">
+            <div class="input-group">
+                <label>Название</label>
+                <input type="text" id="name" placeholder="Например: Nike Dunk Low">
             </div>
-            
-            <div style="display:flex; gap:12px;">
-                <div class="form-group" style="flex: 2;">
-                    <label class="form-label">Цена</label>
+            <div style="display: flex; gap: 10px;">
+                <div class="input-group" style="flex: 2;">
+                    <label>Цена закупа</label>
                     <input type="number" id="price" placeholder="0.00">
                 </div>
-                <div class="form-group" style="flex: 1;">
-                    <label class="form-label">Валюта</label>
+                <div class="input-group" style="flex: 1;">
+                    <label>Валюта</label>
                     <select id="currency">
                         <option value="PLN">PLN</option>
                         <option value="EUR">EUR</option>
@@ -164,75 +175,76 @@
                     </select>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label class="form-label">Доставка (в PLN)</label>
-                <input type="number" id="ship" placeholder="Например: 45">
+            <div class="input-group">
+                <label>Доставка (PLN)</label>
+                <input type="number" id="ship" placeholder="0.00">
             </div>
+            <button class="btn-action" onclick="saveItem()">📦 Добавить на склад</button>
+        </div>
 
-            <button class="btn" id="save-btn" onclick="addItem()">Добавить на склад</button>
+        <div id="tab-stats" class="tab-content">
+            <div class="card" style="flex-direction: column; align-items: flex-start;">
+                <div style="color: var(--secondary-text); font-size: 12px;">ОБЩИЙ КАПИТАЛ</div>
+                <div style="font-size: 28px; font-weight: 800;" id="total-val">0.00 zł</div>
+            </div>
+            <button class="btn-action" style="background: #2c2c2e;" onclick="getReport()">📊 Получить PIT-36 в чат</button>
         </div>
     </div>
 
-    <div class="floating-nav">
-        <div class="nav-item active" onclick="switchTab('tab-stock', this); loadStock();">Склад</div>
-        <div class="nav-item" onclick="switchTab('tab-add', this)">Закуп</div>
+    <div class="navbar">
+        <div class="nav-item active" onclick="switchTab('tab-stock', this); loadStock();">
+            <span class="nav-icon">📦</span>Склад
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-add', this)">
+            <span class="nav-icon">➕</span>Закуп
+        </div>
+        <div class="nav-item" onclick="switchTab('tab-stats', this)">
+            <span class="nav-icon">📊</span>Отчеты
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        
-        // Твоя ссылка без слэша на конце!
-        const API_URL = "https://sierra-stopped-gizmo.ngrok-free.dev"; 
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const USER_ID = urlParams.get('user_id');
+        tg.backgroundColor = '#000000';
+        tg.headerColor = '#1c1c1e';
 
-        const reqHeaders = { 
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': 'true' 
-        };
+        const API_URL = "https://sierra-stopped-gizmo.ngrok-free.dev"; 
+        const USER_ID = new URLSearchParams(window.location.search).get('user_id');
+
+        const headers = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' };
 
         function switchTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-            tg.HapticFeedback.impactOccurred('light');
+            tg.HapticFeedback.impactOccurred('medium');
         }
 
         async function loadStock() {
-            if(!USER_ID) return;
+            const res = await fetch(`${API_URL}/api/stock?user_id=${USER_ID}`, { headers });
+            const items = await res.json();
             const list = document.getElementById('stock-list');
+            let total = 0;
             
-            try {
-                const res = await fetch(`${API_URL}/api/stock?user_id=${USER_ID}`, { headers: reqHeaders });
-                const items = await res.json();
-                
-                if (items.length === 0) {
-                    list.innerHTML = '<div class="error-msg" style="color:var(--hint);">Склад пуст. Перейди в "Закуп", чтобы добавить товар.</div>';
-                    return;
-                }
-                
-                list.innerHTML = '';
-                items.forEach(i => {
-                    list.innerHTML += `
-                    <div class="card">
-                        <div class="img-box">📦</div>
-                        <div>
-                            <div class="title">${i.name}</div>
-                            <div class="price">${i.price.toFixed(2)} PLN</div>
-                        </div>
-                    </div>`;
-                });
-            } catch (e) {
-                list.innerHTML = '<div class="error-msg">⚠️ Ошибка связи с сервером. Проверь ngrok и bot.py!</div>';
-            }
+            list.innerHTML = items.length ? '' : '<div style="text-align:center; padding:50px; color:#8e8e93;">Пусто</div>';
+            
+            items.forEach(i => {
+                total += i.price;
+                list.innerHTML += `
+                <div class="card">
+                    <div class="card-img">👟</div>
+                    <div class="card-info">
+                        <div class="card-name">${i.name}</div>
+                        <div class="card-price">${i.price.toFixed(0)} PLN</div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('total-val').innerText = total.toFixed(2) + ' zł';
         }
 
-        async function addItem() {
-            const btn = document.getElementById('save-btn');
+        async function saveItem() {
             const data = {
                 user_id: USER_ID,
                 name: document.getElementById('name').value,
@@ -240,40 +252,22 @@
                 currency: document.getElementById('currency').value,
                 ship: document.getElementById('ship').value || 0
             };
+            if(!data.name || !data.price) return tg.showAlert("Заполни данные!");
             
-            if(!data.name || !data.price) {
-                tg.HapticFeedback.notificationOccurred('error');
-                return tg.showAlert("Укажи название и цену!");
-            }
-
-            btn.innerText = "Загрузка...";
-            btn.style.opacity = "0.7";
+            await fetch(`${API_URL}/api/add`, { method: 'POST', headers, body: JSON.stringify(data) });
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showPopup({ message: "Товар добавлен!", buttons: [{type: 'close'}] });
             
-            try {
-                const res = await fetch(`${API_URL}/api/add`, { 
-                    method: 'POST', 
-                    headers: reqHeaders, 
-                    body: JSON.stringify(data) 
-                });
-                
-                if(res.ok) {
-                    tg.HapticFeedback.notificationOccurred('success');
-                    document.getElementById('name').value = '';
-                    document.getElementById('price').value = '';
-                    document.getElementById('ship').value = '';
-                    switchTab('tab-stock', document.querySelectorAll('.nav-item')[0]);
-                    loadStock();
-                }
-            } catch (e) {
-                tg.HapticFeedback.notificationOccurred('error');
-                tg.showAlert("Ошибка сервера! Проверь запущен ли ngrok.");
-            }
-            
-            btn.innerText = "Добавить на склад";
-            btn.style.opacity = "1";
+            document.getElementById('name').value = '';
+            document.getElementById('price').value = '';
+            loadStock();
         }
 
-        // Запуск
+        async function getReport() {
+            await fetch(`${API_URL}/api/report`, { method: 'POST', headers, body: JSON.stringify({user_id: USER_ID}) });
+            tg.showPopup({ title: "Отправка", message: "Отчет PIT-36 формируется и придет в чат через секунду." });
+        }
+
         loadStock();
     </script>
 </body>
