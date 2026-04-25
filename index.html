@@ -140,6 +140,34 @@
         
         let selectedItems = [];
 
+        // 1. Читаем данные, которые прислал бот в ссылке
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataParam = urlParams.get('data');
+        const appDiv = document.getElementById('app');
+
+        if (dataParam) {
+            // Распаковываем данные
+            const stockData = JSON.parse(decodeURIComponent(dataParam));
+            appDiv.innerHTML = ''; // Очищаем фейковые Nike и Stone Island
+            
+            if (stockData.length === 0) {
+                appDiv.innerHTML = '<div style="text-align:center; margin-top:20px; color:var(--hint);">Склад пуст. Добавь товары через Excel.</div>';
+            } else {
+                // Рисуем реальные карточки
+                stockData.forEach(item => {
+                    appDiv.innerHTML += `
+                    <div class="card" onclick="toggleSelect(this, ${item.id})">
+                        <div class="img-placeholder">📦</div>
+                        <div class="info">
+                            <div class="title">${item.name}</div>
+                            <div class="price">${item.price.toFixed(0)} zł <span class="status-tag status-stock">На складе</span></div>
+                        </div>
+                        <div class="checkbox"></div>
+                    </div>`;
+                });
+            }
+        }
+
         function toggleSelect(el, id) {
             el.classList.toggle('selected');
             if (el.classList.contains('selected')) {
@@ -164,12 +192,11 @@
         }
 
         function sendToBot() {
-            // ФОРМИРУЕМ ДАННЫЕ ДЛЯ ОТПРАВКИ В PYTHON
             let data = {
                 action: 'sell_multi',
                 ids: selectedItems
             };
-            tg.sendData(JSON.stringify(data)); // Отправляем JSON боту и закрываем окно
+            tg.sendData(JSON.stringify(data)); 
         }
     </script>
 </body>
