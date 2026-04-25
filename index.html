@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CultBase Pro</title>
+    <title>CultBase</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -30,11 +30,12 @@
             position: sticky; top: 0; z-index: 10;
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-weight: bold;
+            font-size: 18px;
         }
 
         .container { padding: 12px; }
 
-        /* Карточки */
         .card {
             background: var(--bg);
             border-radius: 16px;
@@ -62,7 +63,6 @@
         }
         .status-stock { background: #e1f5fe; color: #039be5; }
 
-        /* Чекбокс */
         .checkbox {
             width: 22px; height: 22px;
             border: 2px solid var(--hint);
@@ -77,18 +77,16 @@
             content: '✓'; color: white; font-size: 14px;
         }
 
-        /* Навигация */
         .nav {
             position: fixed; bottom: 0; width: 100%;
             background: var(--bg);
             display: flex; justify-content: space-around;
             padding: 10px 0 25px; border-top: 1px solid rgba(0,0,0,0.05);
         }
-        .nav-btn { text-align: center; color: var(--hint); font-size: 11px; flex: 1; }
+        .nav-btn { text-align: center; color: var(--hint); font-size: 11px; flex: 1; cursor: pointer; }
         .nav-btn.active { color: var(--link); }
         .nav-icon { display: block; font-size: 22px; margin-bottom: 4px; }
 
-        /* Кнопка действия */
         .main-btn {
             position: fixed; bottom: 85px; left: 12px; right: 12px;
             background: var(--btn-bg);
@@ -96,6 +94,7 @@
             padding: 14px; border-radius: 14px;
             text-align: center; font-weight: 700;
             display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -107,31 +106,15 @@
     </div>
 
     <div class="container" id="app">
-        <div class="card" onclick="toggleSelect(this, 1)">
-            <div class="img-placeholder">👟</div>
-            <div class="info">
-                <div class="title">Nike TN Air Max</div>
-                <div class="price">450 zł <span class="status-tag status-stock">На складе</span></div>
-            </div>
-            <div class="checkbox"></div>
-        </div>
-
-        <div class="card" onclick="toggleSelect(this, 2)">
-            <div class="img-placeholder">🧥</div>
-            <div class="info">
-                <div class="title">Stone Island Ghost</div>
-                <div class="price">1250 zł <span class="status-tag status-stock">На складе</span></div>
-            </div>
-            <div class="checkbox"></div>
-        </div>
+        <div style="text-align:center; margin-top:20px; color:var(--hint);">Загрузка склада...</div>
     </div>
 
     <div class="main-btn" id="actionBtn" onclick="sendToBot()">Продать выбранное</div>
 
     <div class="nav">
         <div class="nav-btn active"><span class="nav-icon">📦</span>Склад</div>
-        <div class="nav-btn"><span class="nav-icon">➕</span>Закуп</div>
-        <div class="nav-btn"><span class="nav-icon">📊</span>PIT-36</div>
+        <div class="nav-btn" onclick="sendCommand('import_excel')"><span class="nav-icon">➕</span>Закуп</div>
+        <div class="nav-btn" onclick="sendCommand('export_pit36')"><span class="nav-icon">📊</span>PIT-36</div>
     </div>
 
     <script>
@@ -140,20 +123,23 @@
         
         let selectedItems = [];
 
-        // 1. Читаем данные, которые прислал бот в ссылке
+        // Отправка простых команд (Закуп, PIT-36)
+        function sendCommand(cmd) {
+            tg.sendData(JSON.stringify({ action: cmd }));
+        }
+
+        // Читаем данные, которые прислал бот в ссылке
         const urlParams = new URLSearchParams(window.location.search);
         const dataParam = urlParams.get('data');
         const appDiv = document.getElementById('app');
 
         if (dataParam) {
-            // Распаковываем данные
             const stockData = JSON.parse(decodeURIComponent(dataParam));
-            appDiv.innerHTML = ''; // Очищаем фейковые Nike и Stone Island
+            appDiv.innerHTML = ''; 
             
             if (stockData.length === 0) {
-                appDiv.innerHTML = '<div style="text-align:center; margin-top:20px; color:var(--hint);">Склад пуст. Добавь товары через Excel.</div>';
+                appDiv.innerHTML = '<div style="text-align:center; margin-top:20px; color:var(--hint);">Склад пуст. Нажми "Закуп" внизу.</div>';
             } else {
-                // Рисуем реальные карточки
                 stockData.forEach(item => {
                     appDiv.innerHTML += `
                     <div class="card" onclick="toggleSelect(this, ${item.id})">
@@ -191,6 +177,7 @@
             }
         }
 
+        // Отправка данных о продаже
         function sendToBot() {
             let data = {
                 action: 'sell_multi',
