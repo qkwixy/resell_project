@@ -2,213 +2,662 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CultBase</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CultBase Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <style>
-        :root { --accent: #007aff; --bg: #000; --card-bg: #1c1c1e; --text: #fff; --sub: #8e8e93; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 120px; }
-        
-        .top-bar { background: rgba(28, 28, 30, 0.8); backdrop-filter: blur(20px); padding: 15px 20px; display: flex; justify-content: space-between; position: sticky; top: 0; z-index: 100; border-bottom: 0.5px solid #38383a; font-weight: 800; font-size: 20px; }
-        .tg-link { background: #2481cc; color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        
-        .container { padding: 20px; }
-        .card { background: var(--card-bg); border-radius: 18px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; border: 0.5px solid #38383a; cursor: pointer; }
-        .card-icon { width: 50px; height: 50px; background: #2c2c2e; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
-        .card-name { font-weight: 600; font-size: 18px; margin-bottom: 4px;}
-        .card-price { color: var(--accent); font-weight: 700; font-size: 15px; }
-        .qty-badge { background: #333; color: #fff; font-size: 12px; padding: 4px 8px; border-radius: 10px; margin-left: 8px; }
+        /* ТЕМНАЯ ТЕМА (ПО УМОЛЧАНИЮ) */
+        :root { 
+            --bg-main: #0B0E14; 
+            --bg-card: #151A22; 
+            --bg-input: #1C222C;
+            --border: #262D38; 
+            --accent: #00E5FF; 
+            --accent-glow: rgba(0, 229, 255, 0.2); 
+            --text-main: #FFFFFF; 
+            --text-muted: #8B95A5; 
+            --btn-text: #000000;
+        }
 
-        /* НОВЫЙ ДИЗАЙН ФОРМ: ОГРОМНЫЕ И ПОНЯТНЫЕ */
-        .form-block { margin-bottom: 20px; }
-        label { display: block; font-size: 13px; color: var(--sub); text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
-        input, select { width: 100%; background: var(--card-bg); border: 1px solid #38383a; padding: 18px; border-radius: 16px; color: #fff; font-size: 18px; box-sizing: border-box; outline: none; }
-        input:focus, select:focus { border-color: var(--accent); }
+        /* СВЕТЛАЯ ТЕМА */
+        body.theme-light {
+            --bg-main: #F3F4F6;
+            --bg-card: #FFFFFF;
+            --bg-input: #F9FAFB;
+            --border: #E5E7EB;
+            --accent: #0A84FF; 
+            --accent-glow: rgba(10, 132, 255, 0.25);
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --btn-text: #FFFFFF;
+        }
         
-        .btn { background: var(--accent); color: #fff; border: none; width: 100%; padding: 18px; border-radius: 16px; font-weight: 700; font-size: 18px; margin-top: 10px; cursor: pointer; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        .navbar { position: fixed; bottom: 25px; left: 20px; right: 20px; background: rgba(28,28,30,0.95); backdrop-filter: blur(15px); border-radius: 25px; display: flex; padding: 8px; z-index: 1000; border: 0.5px solid #38383a; }
-        .nav-item { flex: 1; text-align: center; padding: 12px; color: var(--sub); font-size: 12px; font-weight: 600; border-radius: 18px; }
-        .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
+            background: var(--bg-main); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding: 0 0 120px 0; 
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* ГЛАВНАЯ ШАПКА */
+        .header { 
+            padding: 16px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; 
+            background: var(--bg-main);
+            z-index: 100; border-bottom: 1px solid var(--border);
+            transition: background-color 0.3s ease;
+        }
+        .logo { font-size: 22px; font-weight: 900; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;}
+        .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 12px var(--accent); }
         
-        .tab { display: none; } .tab.active { display: block; }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
+        .theme-toggle-btn {
+            background: var(--bg-input); border: 1px solid var(--border);
+            color: var(--text-main); font-size: 16px; width: 36px; height: 36px;
+            border-radius: 18px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s;
+        }
+        .theme-toggle-btn:active { transform: scale(0.9); }
+
+        .tg-btn { 
+            background: rgba(0, 229, 255, 0.1); color: var(--accent); text-decoration: none; 
+            padding: 8px 14px; border-radius: 18px; font-size: 13px; font-weight: 700; 
+            display: flex; align-items: center; gap: 6px; transition: 0.2s; border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        .tg-btn:active { transform: scale(0.95); background: rgba(0, 229, 255, 0.2); }
+        body.theme-light .tg-btn { background: rgba(10, 132, 255, 0.1); border-color: rgba(10, 132, 255, 0.2); }
+
+        /* Вкладки */
+        .tab-content { display: none; opacity: 0; }
+        .tab-content.active { display: block; animation: slideFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideFade {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .container { padding: 20px; }
+        .page-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px;}
+        .page-title::before { content: ''; display: block; width: 5px; height: 22px; background: var(--accent); border-radius: 4px; box-shadow: 0 0 10px var(--accent-glow); }
+
+        /* КАРТОЧКИ (Склад) */
+        .card { 
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; 
+            padding: 16px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.2s ease; cursor: pointer;
+        }
+        .card:active { transform: scale(0.98); border-color: var(--accent); }
+        .card-left { display: flex; align-items: center; gap: 16px; }
+        .card-icon { font-size: 24px; background: var(--bg-input); width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .card-price { font-size: 13px; color: var(--accent); font-weight: 600; }
+        .card-right { text-align: right; }
+        .qty-badge { background: var(--bg-input); color: var(--text-muted); font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 8px; display: inline-block; margin-bottom: 6px;}
+
+        /* ФОРМЫ (Идеальный порядок) */
+        .form-section { background: var(--bg-card); border-radius: 24px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .input-group { margin-bottom: 16px; position: relative; }
+        .input-group:last-child { margin-bottom: 0; }
+        .label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+        
+        .input-wrapper { display: flex; align-items: center; background: var(--bg-input); border-radius: 16px; border: 1px solid transparent; transition: all 0.3s ease; }
+        .input-wrapper:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        
+        input, select { 
+            flex: 1; background: transparent; border: none; padding: 16px; color: var(--text-main); 
+            font-size: 15px; font-weight: 500; outline: none; -webkit-appearance: none; width: 100%;
+        }
+        input::placeholder { color: var(--text-muted); opacity: 0.7; }
+        .input-icon { padding-left: 16px; color: var(--text-muted); font-size: 14px; font-weight: 700;}
+
+        .btn-primary { 
+            background: var(--accent); color: var(--btn-text); border: none; width: 100%; padding: 18px; 
+            border-radius: 16px; font-weight: 700; font-size: 16px; cursor: pointer; 
+            transition: all 0.3s ease; box-shadow: 0 8px 20px var(--accent-glow);
+        }
+        .btn-primary:active { transform: translateY(2px); box-shadow: 0 4px 10px var(--accent-glow); }
+        
+        .btn-secondary {
+            background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border);
+            width: 100%; padding: 18px; border-radius: 16px; font-weight: 700; font-size: 16px; 
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .btn-secondary:active { transform: translateY(2px); background: var(--border); }
+
+        /* ДАШБОРД */
+        .dash-card { background: linear-gradient(145deg, var(--bg-card) 0%, var(--accent-glow) 200%); border: 1px solid var(--border); border-radius: 24px; padding: 24px; margin-bottom: 16px;}
+        .dash-value { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin: 8px 0; color: var(--text-main); }
+        
+        /* ПЛАВАЮЩИЙ ОСТРОВ НАВИГАЦИИ (Dynamic Island) */
+        .island-wrapper { position: fixed; bottom: 30px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; pointer-events: none;}
+        .island-nav { background: var(--bg-card); opacity: 0.95; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 40px; display: flex; padding: 6px; gap: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); pointer-events: auto;}
+        .nav-tab { padding: 12px 24px; color: var(--text-muted); font-size: 14px; font-weight: 600; border-radius: 30px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.3s; }
+        .nav-tab.active { background: var(--accent-glow); color: var(--accent); }
+
+        /* ПЛАВНЫЕ ВЫЕЗЖАЮЩИЕ ШТОРКИ (МОДАЛКИ) */
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
+            z-index: 2000; align-items: flex-end; justify-content: center; 
+            backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        
+        .modal { 
+            background: var(--bg-card); width: 100%; border-radius: 28px 28px 0 0; 
+            padding: 24px 24px 40px; border-top: 1px solid var(--border); 
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+            max-height: 85vh; overflow-y: auto;
+        }
+        .modal-overlay.active .modal { transform: translateY(0); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; position: sticky; top: 0; background: var(--bg-card); padding-bottom: 10px; z-index: 10;}
+        .close-btn { 
+            background: var(--bg-input); border: 1px solid var(--border); width: 36px; height: 36px; 
+            border-radius: 18px; color: var(--text-main); font-size: 18px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; transition: 0.2s;
+        }
+        .close-btn:active { transform: scale(0.9); background: var(--border); }
+        .status-dot { width: 8px; height: 8px; background: #32D74B; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px rgba(50, 215, 75, 0.4);}
+        
+        /* Стили для таблиц сайзчарта и списков легит-чека */
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 14px; }
+        .info-table th { background: var(--bg-input); color: var(--text-muted); text-align: left; padding: 12px; font-weight: 600; border-radius: 8px 8px 0 0;}
+        .info-table td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text-main); }
+        
+        .legit-list { list-style: none; padding: 0; margin: 0; }
+        .legit-list li { padding: 16px 0; border-bottom: 1px solid var(--border); display: flex; gap: 14px; align-items: flex-start; font-size: 14px; line-height: 1.5;}
+        .legit-list li:last-child { border-bottom: none; }
+        .legit-icon { font-size: 24px; background: var(--bg-input); padding: 10px; border-radius: 12px; }
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        CULTBASE
-        <a href="https://t.me/resell_cult" class="tg-link">📢 Канал</a>
+    <div class="header" id="main-header">
+        <div class="logo"><div class="logo-dot"></div> CULTBASE</div>
+        <div class="header-actions">
+            <button class="theme-toggle-btn" onclick="switchTab('tab-settings', null)">⚙️</button>
+            <a href="https://t.me/resell_cult" class="tg-btn" target="_blank">📣 Канал</a>
+        </div>
     </div>
 
     <div class="container">
-        <div id="tab-stock" class="tab active">
+        
+        <!-- СКЛАД -->
+        <div id="tab-stock" class="tab-content active">
+            <h1 class="page-title">Склад</h1>
+            <div class="input-group" style="margin-bottom: 24px;">
+                <div class="input-wrapper">
+                    <span class="input-icon">🔍</span>
+                    <input type="text" id="search" placeholder="Поиск по бренду..." oninput="renderStock()">
+                </div>
+            </div>
             <div id="stock-list"></div>
         </div>
 
-        <div id="tab-add" class="tab">
+        <!-- ЗАКУП -->
+        <div id="tab-add" class="tab-content">
+            <h1 class="page-title">Закупка</h1>
             
-            <div class="form-block">
-                <label>Что за вещь?</label>
-                <div style="display: flex; gap: 10px;">
-                    <select id="icon" style="width: 30%;">
-                        <option value="👟">👟</option>
-                        <option value="👕">👕</option>
-                        <option value="🧢">🧢</option>
-                    </select>
-                    <input type="text" id="name" placeholder="Например: Nike Dunk" style="width: 70%;">
+            <div class="form-section">
+                <div class="input-group">
+                    <span class="label">Идентификация</span>
+                    <div class="input-wrapper" style="margin-bottom: 10px;">
+                        <select id="icon" style="flex: 0 0 60px; text-align: center; border-right: 1px solid var(--border); border-radius: 0;">
+                            <option value="👟">👟</option><option value="👕">👕</option><option value="🧢">🧢</option><option value="📦">📦</option>
+                        </select>
+                        <input type="text" id="name" placeholder="Название (например, Nike Dunk)">
+                    </div>
                 </div>
             </div>
 
-            <div class="form-block">
-                <label>Цена за 1 штуку</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="number" id="price" placeholder="0.00" style="width: 60%;">
-                    <select id="currency" style="width: 40%;">
-                        <option value="PLN">PLN</option>
-                        <option value="EUR">EUR</option>
-                        <option value="CNY">CNY</option>
-                    </select>
+            <div class="form-section">
+                <div class="input-group">
+                    <span class="label">Затраты на 1 единицу</span>
+                    <div class="input-wrapper">
+                        <span class="input-icon" style="font-size: 16px;">💰</span>
+                        <input type="number" id="price" placeholder="Сумма закупки">
+                        <select id="currency" style="flex: 0 0 80px; border-left: 1px solid var(--border); border-radius: 0;">
+                            <option value="PLN">PLN</option><option value="EUR">EUR</option><option value="CNY">CNY</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 16px;">
+                    <div class="input-group" style="flex: 1;">
+                        <span class="label">Кол-во</span>
+                        <div class="input-wrapper">
+                            <input type="number" id="qty" value="1" min="1" style="text-align: center;">
+                        </div>
+                    </div>
+                    <div class="input-group" style="flex: 2;">
+                        <span class="label">Логистика (PLN)</span>
+                        <div class="input-wrapper">
+                            <input type="number" id="ship" placeholder="0.00">
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-block">
-                <label>Доставка (PLN) + Количество</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="number" id="ship" placeholder="Доставка" style="width: 60%;">
-                    <input type="number" id="qty" placeholder="Шт." value="1" min="1" style="width: 40%;">
-                </div>
-            </div>
-
-            <button class="btn" id="add-btn" onclick="saveItem()">Добавить на склад</button>
+            <button class="btn-primary" onclick="saveItem()">📦 Добавить в базу</button>
         </div>
 
-        <div id="tab-stats" class="tab">
-            <div class="card" style="flex-direction: column; align-items: flex-start; padding: 25px;">
-                <div style="color: var(--sub); font-size: 13px; font-weight: 600; margin-bottom: 8px;">ДЕНЕГ В ТОВАРЕ</div>
-                <div style="font-size: 34px; font-weight: 800;" id="total-val">0.00 zł</div>
+        <!-- ДАШБОРД -->
+        <div id="tab-dash" class="tab-content">
+            <h1 class="page-title">Аналитика</h1>
+
+            <div class="dash-card">
+                <span class="label" style="color: var(--accent);">Замороженный капитал</span>
+                <div class="dash-value" id="d-frozen">0 PLN</div>
+                <div style="font-size: 13px; color: var(--text-muted);">Сумма всех товаров в наличии</div>
             </div>
-            <button class="btn" style="background: #2c2c2e; margin-top: 20px;" onclick="getReport()">📊 Сформировать PIT-36</button>
+
+            <div class="dash-card" style="background: var(--bg-card);">
+                <span class="label" style="color: #32D74B;">Чистая прибыль (Месяц)</span>
+                <div class="dash-value" id="d-profit">0 PLN</div>
+                <div style="font-size: 13px; color: var(--text-muted);">Лучший товар: <span id="d-top" style="color: var(--text-main); font-weight: 600;">-</span></div>
+            </div>
+
+            <button class="btn-secondary" onclick="getReport()">📊 Выгрузить PIT-36</button>
+        </div>
+
+        <!-- НАСТРОЙКИ -->
+        <div id="tab-settings" class="tab-content">
+            <h1 class="page-title">Настройки</h1>
+
+            <!-- ИНСТРУМЕНТЫ РЕСЕЛЛЕРА -->
+            <div class="form-section">
+                <span class="label">Инструменты Реселлера</span>
+                
+                <div class="card" onclick="openInfoModal('sizecharts')" style="background: rgba(10, 132, 255, 0.05); border-color: rgba(10, 132, 255, 0.2);">
+                    <div class="card-left">
+                        <div style="font-size: 24px;">📏</div>
+                        <div>
+                            <div class="card-title" style="color: var(--accent);">Таблицы размеров</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">Nike, Adidas, Yeezy и др.</div>
+                        </div>
+                    </div>
+                    <div class="card-right" style="color: var(--accent);">→</div>
+                </div>
+
+                <div class="card" onclick="openInfoModal('legitcheck')" style="margin-bottom: 0; background: rgba(50, 215, 75, 0.05); border-color: rgba(50, 215, 75, 0.2);">
+                    <div class="card-left">
+                        <div style="font-size: 24px;">🔎</div>
+                        <div>
+                            <div class="card-title" style="color: #32D74B;">База Legit-Check</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">На что смотреть при выкупе</div>
+                        </div>
+                    </div>
+                    <div class="card-right" style="color: #32D74B;">→</div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <span class="label">Интерфейс</span>
+                <div class="card" style="margin-bottom: 0;" onclick="toggleTheme()">
+                    <div class="card-left">
+                        <div style="font-size: 24px;" id="theme-icon">🌙</div>
+                        <div>
+                            <div class="card-title" id="theme-text">Темная тема</div>
+                        </div>
+                    </div>
+                    <div class="card-right" style="color: var(--text-muted); font-size: 14px;">🔄 Сменить</div>
+                </div>
+            </div>
+
+            <!-- НАСТРОЙКИ КОМИССИЙ -->
+            <div class="form-section">
+                <span class="label">Комиссии площадок (для расчета профита)</span>
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <span class="input-icon">Vinted Fee</span>
+                        <input type="number" id="fee-vinted" placeholder="Например: 5%">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <span class="input-icon">Grailed Fee</span>
+                        <input type="number" id="fee-grailed" placeholder="Например: 9%">
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="saveFees()" style="padding: 12px; font-size: 14px; margin-top: 8px;">Сохранить тарифы</button>
+            </div>
+
+            <div class="form-section">
+                <span class="label">Интеграции</span>
+                <div class="card" style="margin-bottom: 0; background: rgba(0, 229, 255, 0.05); border-color: rgba(0, 229, 255, 0.2);">
+                    <div class="card-left">
+                        <div>
+                            <div class="card-title" style="color: var(--accent);">API Центробанка</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Авто-обновление курсов PLN/EUR/CNY</div>
+                        </div>
+                    </div>
+                    <div class="card-right"><span class="status-dot"></span></div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="navbar" id="nav">
-        <div class="nav-item active" onclick="switchTab('tab-stock', this); loadStock();">📦 Склад</div>
-        <div class="nav-item" onclick="switchTab('tab-add', this)">➕ Закуп</div>
-        <div class="nav-item" onclick="switchTab('tab-stats', this)">📊 Отчеты</div>
+    <!-- МОДАЛКА: ПРОДАЖА (ОБНОВЛЕНО С ВЫБОРОМ ПЛОЩАДКИ) -->
+    <div class="modal-overlay" id="modal-sell" onclick="if(event.target === this) closeModal('modal-sell')">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modal-name" style="margin: 0; font-size: 22px; letter-spacing: -0.5px;">Название</h2>
+                    <div style="color: var(--text-muted); font-size: 14px; margin-top: 4px;" id="modal-cost"></div>
+                </div>
+                <button class="close-btn" onclick="closeModal('modal-sell')">✕</button>
+            </div>
+            
+            <div class="form-section" style="padding: 16px;">
+                <span class="label">Площадка продажи</span>
+                <div class="input-wrapper" style="background: var(--bg-main); margin-bottom: 16px;">
+                    <select id="sell-platform">
+                        <option value="none">🤝 Без комиссии (Встреча/Direct)</option>
+                        <option value="vinted">🟣 Vinted</option>
+                        <option value="grailed">⚫️ Grailed</option>
+                    </select>
+                </div>
+
+                <span class="label">Цена продажи (PLN)</span>
+                <div class="input-wrapper" style="background: var(--bg-main);">
+                    <input type="number" id="sell-price" placeholder="Введите итоговую сумму">
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="confirmSale()">Подтвердить продажу</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА: ИНФО (ЛЕГИТ И САЙЗЧАРТЫ) -->
+    <div class="modal-overlay" id="modal-info" onclick="if(event.target === this) closeModal('modal-info')">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="info-title" style="margin: 0; font-size: 22px; letter-spacing: -0.5px;">Информация</h2>
+                <button class="close-btn" onclick="closeModal('modal-info')">✕</button>
+            </div>
+            <div id="info-content">
+                <!-- Контент подставляется скриптом -->
+            </div>
+        </div>
+    </div>
+
+    <div class="island-wrapper" id="nav-wrapper">
+        <div class="island-nav">
+            <div class="nav-tab active" onclick="switchTab('tab-stock', this); loadStock();"><span class="nav-icon">📦</span> Склад</div>
+            <div class="nav-tab" onclick="switchTab('tab-add', this)"><span class="nav-icon">➕</span> Закуп</div>
+            <div class="nav-tab" onclick="switchTab('tab-dash', this)"><span class="nav-icon">📈</span> Отчеты</div>
+        </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.expand(); 
         
-        // РАДИКАЛЬНЫЙ ФИКС КЛАВИАТУРЫ (ПРОСТО УБИВАЕМ МЕНЮ)
-        const nav = document.getElementById('nav');
-        document.querySelectorAll('input, select').forEach(el => {
-            el.addEventListener('focus', () => nav.style.display = 'none');
-            el.addEventListener('blur', () => setTimeout(() => nav.style.display = 'flex', 100));
+        // --- ЛОГИКА ТЕМЫ ---
+        let currentTheme = localStorage.getItem('cultbase_theme') || (tg.colorScheme === 'light' ? 'light' : 'dark');
+
+        function applyTheme(theme) {
+            const themeText = document.getElementById('theme-text');
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (theme === 'light') {
+                document.body.classList.add('theme-light');
+                if(themeIcon) themeIcon.innerText = '☀️';
+                if(themeText) themeText.innerText = 'Светлая тема';
+                tg.setHeaderColor('#F3F4F6'); tg.setBackgroundColor('#F3F4F6');
+            } else {
+                document.body.classList.remove('theme-light');
+                if(themeIcon) themeIcon.innerText = '🌙';
+                if(themeText) themeText.innerText = 'Темная тема';
+                tg.setHeaderColor('#0B0E14'); tg.setBackgroundColor('#0B0E14');
+            }
+            localStorage.setItem('cultbase_theme', theme);
+            currentTheme = theme;
+        }
+
+        function toggleTheme() {
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        applyTheme(currentTheme);
+
+        // --- ЛОГИКА КОМИССИЙ ---
+        document.getElementById('fee-vinted').value = localStorage.getItem('fee_vinted') || '';
+        document.getElementById('fee-grailed').value = localStorage.getItem('fee_grailed') || '';
+
+        function saveFees() {
+            localStorage.setItem('fee_vinted', document.getElementById('fee-vinted').value);
+            localStorage.setItem('fee_grailed', document.getElementById('fee-grailed').value);
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert('Тарифы комиссий успешно сохранены!');
+        }
+
+        // --- БРОНЕБОЙНЫЙ ФИКС СКРЫТИЯ МЕНЮ + ЗАКРЫТИЕ КЛАВИАТУРЫ ПО ТАПУ ---
+        const bNav = document.getElementById('nav-wrapper');
+        let initHeight = window.innerHeight;
+
+        function hideMenu() {
+            bNav.style.opacity = '0';
+            bNav.style.pointerEvents = 'none';
+            bNav.style.transform = 'translateY(150px)';
+        }
+
+        function showMenu() {
+            bNav.style.opacity = '1';
+            bNav.style.pointerEvents = 'auto';
+            bNav.style.transform = 'translateY(0)';
+        }
+
+        document.addEventListener('focusin', (e) => {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') { hideMenu(); }
         });
 
-        // БЕРЕМ ID ИЗ САМОГО ТЕЛЕГРАМА НАПРЯМУЮ, ЧТОБЫ КНОПКА ТОЧНО РАБОТАЛА
-        const USER_ID = tg.initDataUnsafe?.user?.id || new URLSearchParams(window.location.search).get('user_id');
-        const API_URL = "https://sierra-stopped-gizmo.ngrok-free.dev"; 
-        const headers = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' };
+        document.addEventListener('focusout', (e) => {
+            setTimeout(() => {
+                if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') { showMenu(); }
+            }, 150);
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerHeight < initHeight - 100) hideMenu();
+            else if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'SELECT') showMenu();
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') {
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'BUTTON') {
+                    document.activeElement.blur();
+                }
+            }
+        });
+
+        const USER_ID = tg.initDataUnsafe?.user?.id || new URLSearchParams(window.location.search).get('user_id') || 1047059344;
+        let allStock = []; 
+        let currentSellId = null;
 
         function switchTab(id, el) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            if (el) {
+                document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
+                el.classList.add('active');
+            } else {
+                document.querySelectorAll('.nav-tab').forEach(n => n.classList.remove('active'));
+            }
+            
+            const target = document.getElementById(id);
+            target.classList.remove('active');
+            void target.offsetWidth; 
+            target.classList.add('active');
+            
+            if(id === 'tab-stock') loadStock();
+            if(id === 'tab-dash') loadDashboard();
             tg.HapticFeedback.impactOccurred('light');
         }
 
         async function loadStock() {
-            if (!USER_ID) return;
-            const res = await fetch(`${API_URL}/api/stock?user_id=${USER_ID}`, { headers });
-            const items = await res.json();
+            try {
+                const res = await fetch(`/api/stock?user_id=${USER_ID}`);
+                allStock = await res.json();
+                renderStock();
+            } catch(e) {}
+        }
+
+        function renderStock() {
             const list = document.getElementById('stock-list');
-            let total = 0;
-            
-            if (!items.length) {
-                list.innerHTML = '<div style="text-align:center; padding:50px; color:#8e8e93;">На складе пока пусто.</div>';
-                document.getElementById('total-val').innerText = '0.00 zł';
-                return;
+            const q = document.getElementById('search').value.toLowerCase();
+            let filtered = allStock.filter(i => i.name.toLowerCase().includes(q));
+
+            if (!filtered.length) { 
+                list.innerHTML = `
+                    <div style="text-align:center; padding:60px 20px; color:var(--text-muted);">
+                        <div style="font-size: 40px; margin-bottom: 16px;">📭</div>
+                        <div style="font-size: 16px; font-weight: 600; color: var(--text-main);">Ничего не найдено</div>
+                        <div style="font-size: 13px; margin-top: 8px;">Перейдите во вкладку "Закуп", чтобы добавить товар.</div>
+                    </div>`; 
+                return; 
             }
             
             list.innerHTML = '';
-            items.forEach(i => {
-                total += (i.price * i.qty);
+            filtered.reverse().forEach(i => {
                 list.innerHTML += `
-                <div class="card" onclick="sellItem(${i.id}, '${i.name}', ${i.price})">
-                    <div class="card-icon">${i.icon}</div>
-                    <div style="flex:1">
-                        <div class="card-name">${i.name} <span class="qty-badge">${i.qty} шт</span></div>
-                        <div class="card-price">Себестоимость: ${i.price.toFixed(1)} zł</div>
+                <div class="card" onclick="openSellModal(${i.id}, '${i.name}', ${i.price})">
+                    <div class="card-left">
+                        <div class="card-icon">${i.icon}</div>
+                        <div>
+                            <div class="card-title">${i.name}</div>
+                            <div class="card-price">Себес: ${i.price.toFixed(1)} PLN</div>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <div class="qty-badge">${i.qty} шт</div>
+                        <div><span class="status-dot"></span></div>
                     </div>
                 </div>`;
             });
-            document.getElementById('total-val').innerText = total.toFixed(2) + ' zł';
         }
 
         async function saveItem() {
-            if (!USER_ID) return tg.showAlert("Ошибка: Телеграм не передал твой ID.");
-            
-            const btn = document.getElementById('add-btn');
             const data = {
-                user_id: USER_ID, icon: document.getElementById('icon').value,
-                name: document.getElementById('name').value, price: document.getElementById('price').value,
-                currency: document.getElementById('currency').value, qty: document.getElementById('qty').value || 1,
-                ship: document.getElementById('ship').value || 0
+                user_id: USER_ID, icon: document.getElementById('icon').value, name: document.getElementById('name').value, 
+                price: document.getElementById('price').value, currency: document.getElementById('currency').value, 
+                qty: document.getElementById('qty').value || 1, ship: document.getElementById('ship').value || 0,
+                status: 'STOCK'
             };
+            if(!data.name || !data.price) return tg.showAlert("❗️ Заполните название и цену.");
             
-            if(!data.name || !data.price) return tg.showAlert("Заполни название и цену!");
-            
-            btn.innerText = "⏳ Загрузка...";
-            
-            try {
-                const res = await fetch(`${API_URL}/api/add`, { method: 'POST', headers, body: JSON.stringify(data) });
-                if(res.ok) {
-                    tg.HapticFeedback.notificationOccurred('success');
-                    document.getElementById('name').value = ''; 
-                    document.getElementById('price').value = '';
-                    document.getElementById('ship').value = '';
-                    document.getElementById('qty').value = '1';
-                    loadStock(); 
-                    switchTab('tab-stock', document.querySelectorAll('.nav-item')[0]);
-                } else {
-                    tg.showAlert("Ошибка базы данных. Ты удалил старую базу?");
-                }
-            } catch(e) {
-                tg.showAlert("Сервер не отвечает. ngrok включен?");
-            }
-            btn.innerText = "Добавить на склад";
-        }
-
-        function sellItem(id, name, cost) {
-            tg.showPopup({
-                title: "Продажа товара",
-                message: `Нажми 'Продать', чтобы списать ${name}. Себестоимость: ${cost.toFixed(1)} zł`,
-                buttons: [{id: "sell", type: "default", text: "Списать со склада"}, {type: "cancel"}]
-            }, (btnId) => {
-                if (btnId === "sell") confirmSale(id, cost * 1.5); // Пока тестовая продажа +50% 
-            });
-        }
-
-        async function confirmSale(id, sellPrice) {
-            await fetch(`${API_URL}/api/sell`, { method: 'POST', headers, body: JSON.stringify({id: id, sell_price: sellPrice}) });
+            await fetch(`/api/add`, { method: 'POST', body: JSON.stringify(data) });
             tg.HapticFeedback.notificationOccurred('success');
+            
+            document.getElementById('name').value = ''; document.getElementById('price').value = ''; document.getElementById('ship').value = '';
+            switchTab('tab-stock', document.querySelectorAll('.nav-tab')[0]);
+        }
+
+        async function loadDashboard() {
+            try {
+                const res = await fetch(`/api/dashboard?user_id=${USER_ID}`);
+                const data = await res.json();
+                document.getElementById('d-frozen').innerText = data.frozen.toFixed(0) + ' PLN';
+                document.getElementById('d-profit').innerText = data.month_profit.toFixed(0) + ' PLN';
+                document.getElementById('d-top').innerText = data.top_item;
+            } catch(e) {}
+        }
+
+        // --- УПРАВЛЕНИЕ МОДАЛКАМИ ---
+        function openSellModal(id, name, cost) {
+            currentSellId = id;
+            document.getElementById('modal-name').innerText = name;
+            document.getElementById('modal-cost').innerText = "Себестоимость: " + cost.toFixed(1) + " PLN";
+            
+            const overlay = document.getElementById('modal-sell');
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('active'), 10);
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function openInfoModal(type) {
+            const overlay = document.getElementById('modal-info');
+            const title = document.getElementById('info-title');
+            const content = document.getElementById('info-content');
+
+            if (type === 'sizecharts') {
+                title.innerText = "Таблицы размеров (Nike)";
+                content.innerHTML = `
+                    <p style="color: var(--text-muted); font-size: 14px;">Мужская сетка кроссовок Nike / Jordan</p>
+                    <table class="info-table">
+                        <tr><th>US</th><th>EU</th><th>CM</th></tr>
+                        <tr><td>8</td><td>41</td><td>26</td></tr>
+                        <tr><td>8.5</td><td>42</td><td>26.5</td></tr>
+                        <tr><td>9</td><td>42.5</td><td>27</td></tr>
+                        <tr><td>9.5</td><td>43</td><td>27.5</td></tr>
+                        <tr><td>10</td><td>44</td><td>28</td></tr>
+                        <tr><td>10.5</td><td>44.5</td><td>28.5</td></tr>
+                        <tr><td>11</td><td>45</td><td>29</td></tr>
+                    </table>
+                `;
+            } else if (type === 'legitcheck') {
+                title.innerText = "База Legit-Check";
+                content.innerHTML = `
+                    <p style="color: var(--text-muted); font-size: 14px;">На что обращать внимание при выкупе:</p>
+                    <ul class="legit-list">
+                        <li><span class="legit-icon">📦</span> <div><b>Коробка:</b> Проверь шрифт на бирке (size tag), штамп внутри и ровность склейки.</div></li>
+                        <li><span class="legit-icon">👟</span> <div><b>Запах:</b> Оригиналы с завода пахнут фабричным клеем, а не едкой химией.</div></li>
+                        <li><span class="legit-icon">🪡</span> <div><b>Швы:</b> У оригинала шов плотный и ровный. У копий часто двоится шов на пятке.</div></li>
+                        <li><span class="legit-icon">🏷️</span> <div><b>Бирки:</b> У одежды (Stone Island, CP) сканируй Certilogo.</div></li>
+                    </ul>
+                `;
+            }
+
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('active'), 10);
+            tg.HapticFeedback.impactOccurred('light');
+        }
+        
+        function closeModal(modalId) { 
+            const overlay = document.getElementById(modalId);
+            overlay.classList.remove('active');
+            setTimeout(() => { 
+                overlay.style.display = 'none'; 
+                if(modalId === 'modal-sell') {
+                    document.getElementById('sell-price').value = ''; 
+                    document.getElementById('sell-platform').value = 'none';
+                }
+            }, 300);
+        }
+
+        async function confirmSale() {
+            const sellPrice = parseFloat(document.getElementById('sell-price').value);
+            const platform = document.getElementById('sell-platform').value;
+            
+            if(!sellPrice) return tg.showAlert("❗️ Введите сумму продажи.");
+
+            let feePercent = 0;
+            if (platform === 'vinted') feePercent = parseFloat(localStorage.getItem('fee_vinted')) || 0;
+            if (platform === 'grailed') feePercent = parseFloat(localStorage.getItem('fee_grailed')) || 0;
+            
+            await fetch(`/api/sell`, { 
+                method: 'POST', 
+                body: JSON.stringify({
+                    id: currentSellId, 
+                    sell_price: sellPrice,
+                    fee_percent: feePercent 
+                }) 
+            });
+            
+            tg.HapticFeedback.notificationOccurred('success');
+            closeModal('modal-sell'); 
             loadStock();
         }
 
         async function getReport() {
-            const res = await fetch(`${API_URL}/api/report`, { method: 'POST', headers, body: JSON.stringify({user_id: USER_ID}) });
-            const data = await res.json();
-            
-            if (data.status === "empty") {
-                tg.showAlert("❌ У тебя еще нет проданных товаров для отчета!");
-            } else {
-                tg.showPopup({ message: "✅ Отчет отправлен тебе в личные сообщения!" });
-            }
+            await fetch(`/api/report`, { method: 'POST', body: JSON.stringify({user_id: USER_ID}) });
+            tg.showPopup({ message: "Отчет PIT-36 отправлен в чат бота." });
         }
 
         loadStock();
