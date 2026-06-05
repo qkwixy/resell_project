@@ -6,6 +6,7 @@
     <title>CultBase Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         /* ТЕМНАЯ ТЕМА (По умолчанию) */
         :root { 
@@ -22,7 +23,7 @@
             --ios-spring: cubic-bezier(0.25, 1, 0.5, 1); 
         }
 
-        /* СВЕТЛАЯ ТЕМА (Стиль Apple iOS) */
+        /* СВЕТЛАЯ ТЕМА (Чистый iOS Стиль) */
         body.theme-light { 
             --bg-main: #F2F2F7; 
             --bg-header: rgba(242, 242, 247, 0.85); 
@@ -30,18 +31,33 @@
             --bg-input: #E5E5EA; 
             --border: #D1D1D6; 
             --accent: #007AFF; 
-            --accent-glow: rgba(0, 122, 255, 0.25); 
+            --accent-glow: rgba(0, 122, 255, 0.15); 
             --text-main: #000000; 
             --text-muted: #8E8E93; 
             --btn-text: #FFFFFF; 
         }
         
-        /* Улучшения для светлой темы: легкие тени и мягкие бордеры */
-        body.theme-light .card { box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-color: transparent; }
-        body.theme-light .form-section { box-shadow: 0 4px 12px rgba(0,0,0,0.04); border-color: transparent; }
-        body.theme-light .dash-card { box-shadow: 0 4px 12px rgba(0,0,0,0.04); border-color: transparent; }
-        body.theme-light .input-wrapper { background: #FFFFFF; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
-        body.theme-light .island-nav { box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-color: transparent; }
+        /* Глубокая проработка светлой темы (убираем грязные цвета) */
+        body.theme-light .card { box-shadow: 0 2px 10px rgba(0,0,0,0.03); border-color: transparent; }
+        body.theme-light .form-section { box-shadow: 0 4px 14px rgba(0,0,0,0.03); border-color: transparent; }
+        body.theme-light .input-wrapper { background: #FFFFFF; border: 1px solid var(--border); box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); }
+        body.theme-light .island-nav { box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-color: transparent; }
+        body.theme-light .modal { box-shadow: 0 -10px 40px rgba(0,0,0,0.1); }
+        body.theme-light .btn-primary { box-shadow: 0 4px 14px var(--accent-glow); }
+        body.theme-light .btn-secondary { background: #FFFFFF; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+
+        /* Специальные классы для дашборда, чтобы они красиво меняли цвета в обеих темах */
+        .card-gold { background: rgba(255, 215, 0, 0.05); border-color: rgba(255, 215, 0, 0.3); }
+        body.theme-light .card-gold { background: #FFFBF0; border-color: #FFE066; }
+        
+        .card-frozen { background: linear-gradient(145deg, var(--bg-card) 0%, var(--accent-glow) 200%); }
+        body.theme-light .card-frozen { background: linear-gradient(145deg, #FFFFFF 0%, #E5F0FF 200%); border-color: transparent; box-shadow: 0 4px 14px rgba(0, 122, 255, 0.1); }
+        
+        .card-gross { background: rgba(10, 132, 255, 0.05); border-color: rgba(10, 132, 255, 0.2); }
+        body.theme-light .card-gross { background: #F0F8FF; border-color: #A3D1FF; }
+        
+        .card-profit { background: rgba(50, 215, 75, 0.05); border-color: rgba(50, 215, 75, 0.2); }
+        body.theme-light .card-profit { background: #F0FFF4; border-color: #99E6AB; }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; background: var(--bg-main); color: var(--text-main); margin: 0; padding: 0 0 120px 0; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; scroll-behavior: smooth; }
@@ -53,12 +69,13 @@
         
         .plan-badge-header { font-size: 10px; font-weight: 800; background: var(--bg-input); color: var(--text-muted); padding: 4px 8px; border-radius: 8px; margin-left: 4px; letter-spacing: 0.5px; text-transform: uppercase; border: 1px solid var(--border); cursor: pointer; transition: transform 0.2s var(--ios-spring), background-color 0.3s ease; }
         .plan-badge-header:active { transform: scale(0.9); }
-        .plan-badge-header.pro { background: rgba(var(--accent-glow)); color: var(--accent); border-color: var(--accent-glow); }
+        .plan-badge-header.pro { background: var(--accent-glow); color: var(--accent); border-color: transparent; }
 
         .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
         .theme-toggle-btn { background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); font-size: 16px; width: 36px; height: 36px; border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s var(--ios-spring), background-color 0.3s ease; }
         .theme-toggle-btn:active { transform: scale(0.85); background: var(--border); }
-        .tg-btn { background: var(--accent-glow); color: var(--accent); text-decoration: none; padding: 8px 14px; border-radius: 18px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.2s var(--ios-spring), background-color 0.3s ease; border: 1px solid var(--accent-glow); cursor: pointer;}
+        
+        .tg-btn { background: var(--accent-glow); color: var(--accent); text-decoration: none; padding: 8px 14px; border-radius: 18px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.2s var(--ios-spring), background-color 0.3s ease; border: 1px solid transparent; cursor: pointer;}
         .tg-btn:active { transform: scale(0.92); }
 
         .tab-content { display: none; opacity: 0; }
@@ -119,8 +136,11 @@
 
         .plan-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 16px; position: relative; overflow: hidden; transition: transform 0.2s var(--ios-spring);}
         .plan-card:active { transform: scale(0.98); }
+        
+        /* Цветовое выделение тарифов */
         .plan-card.recommended { border: 2px solid var(--accent); box-shadow: 0 0 20px var(--accent-glow); background: rgba(0, 229, 255, 0.05); }
         body.theme-light .plan-card.recommended { background: var(--accent-glow); }
+        
         .plan-badge { position: absolute; top: 0; right: 0; background: var(--accent); color: var(--btn-text); font-size: 10px; font-weight: 800; padding: 6px 12px; border-radius: 0 0 0 16px; letter-spacing: 0.5px; text-transform: uppercase;}
         
         .plan-features { list-style: none; padding: 0; margin: 0; font-size: 14px; color: var(--text-muted); }
@@ -128,6 +148,10 @@
         .plan-features li::before { content: '✓'; color: #32D74B; font-weight: 800; }
         .plan-features li.locked { opacity: 0.5; text-decoration: line-through; }
         .plan-features li.locked::before { content: '✕'; color: #FF453A; }
+
+        /* ОНБОРДИНГ ЭКРАН */
+        .onboarding-icon { font-size: 32px; background: var(--bg-input); width: 64px; height: 64px; border-radius: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .onboarding-item { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; text-align: left; }
     </style>
 </head>
 <body>
@@ -213,7 +237,7 @@
             <h1 class="page-title"><div class="page-title-left">Аналитика</div></h1>
 
             <div id="pro-stats" style="display: none; margin-bottom: 20px; gap: 12px;">
-                <div class="dash-card" style="flex: 1; margin-bottom: 0; background: rgba(255, 215, 0, 0.05); border-color: rgba(255, 215, 0, 0.3);">
+                <div class="dash-card card-gold" style="flex: 1; margin-bottom: 0;">
                     <span class="label" style="color: #FFD700;">Ваш ROI</span>
                     <div class="dash-value" id="d-roi" style="font-size: 28px;">0%</div>
                 </div>
@@ -229,7 +253,7 @@
             </div>
 
             <div id="business-stats" style="display: none; margin-bottom: 20px;">
-                <div class="form-section" style="background: rgba(255, 215, 0, 0.05); border-color: rgba(255, 215, 0, 0.3); padding: 16px;">
+                <div class="form-section card-gold" style="padding: 16px;">
                     <span class="label" style="color: #FFD700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">👑 Бизнес-Аналитика</span>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
                         <span style="color: var(--text-muted); font-size: 14px;">Средняя маржа с вещи:</span>
@@ -239,25 +263,25 @@
                         <span style="color: var(--text-muted); font-size: 14px;">Топ прибыльных брендов:</span>
                         <b id="d-top-brands" style="text-align: right; font-size: 14px; max-width: 50%; line-height: 1.4;">-</b>
                     </div>
-                    <button class="btn-secondary" style="margin-top: 16px; padding: 12px; font-size: 14px; border-color: #FFD700; color: #FFD700;" onclick="openExpenseModal()">
+                    <button class="btn-secondary" style="margin-top: 16px; padding: 12px; font-size: 14px; border-color: #FFD700; color: #FFD700; background: transparent;" onclick="openExpenseModal()">
                         💸 Внести доп. расход
                     </button>
                 </div>
             </div>
 
-            <div class="dash-card" style="background: linear-gradient(145deg, var(--bg-card) 0%, var(--accent-glow) 200%);">
+            <div class="dash-card card-frozen">
                 <span class="label" style="color: var(--accent);">Замороженный капитал</span>
                 <div class="dash-value" id="d-frozen">0</div>
                 <div style="font-size: 13px; color: var(--text-muted);">Сумма всех товаров в наличии</div>
             </div>
 
-            <div class="dash-card" style="background: rgba(10, 132, 255, 0.05); border-color: rgba(10, 132, 255, 0.2);">
+            <div class="dash-card card-gross">
                 <span class="label" style="color: #0A84FF;">Общая выручка (Грязными)</span>
                 <div class="dash-value" id="d-gross">0</div>
                 <div style="font-size: 13px; color: var(--text-muted);">Всего получено денег от покупателей</div>
             </div>
 
-            <div class="dash-card" style="background: rgba(50, 215, 75, 0.05); border-color: rgba(50, 215, 75, 0.2);">
+            <div class="dash-card card-profit">
                 <span class="label" style="color: #32D74B;">Чистая прибыль (Месяц)</span>
                 <div class="dash-value" id="d-profit">0</div>
                 <div style="font-size: 13px; color: var(--text-muted);">За вычетом себестоимости и расходов</div>
@@ -268,15 +292,15 @@
 
         <div id="tab-settings" class="tab-content">
             <h1 class="page-title"><div class="page-title-left">Настройки</div></h1>
-
-            <div class="form-section" style="background: linear-gradient(145deg, var(--bg-card) 0%, rgba(0, 229, 255, 0.05) 200%); border-color: rgba(0, 229, 255, 0.1);">
+            
+            <div class="form-section card-frozen">
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 56px; height: 56px; background: var(--bg-input); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid var(--border);">👤</div>
+                    <div style="width: 56px; height: 56px; background: var(--bg-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid var(--border);">👤</div>
                     <div style="flex: 1;">
                         <div style="font-size: 18px; font-weight: 800;" id="profile-name">Reseller</div>
                         <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">План: <b id="profile-plan-text" style="color: var(--text-main);">Базовый</b></div>
                     </div>
-                    <button class="tg-btn" style="padding: 8px 16px; font-size: 12px;" onclick="openPremiumModal()">💎 PRO</button>
+                    <button class="tg-btn" style="padding: 8px 16px; font-size: 12px; background: var(--bg-main);" onclick="openPremiumModal()">💎 PRO</button>
                 </div>
             </div>
 
@@ -316,46 +340,45 @@
                 <div class="card" style="margin-bottom: 0;" onclick="toggleTheme()">
                     <div class="card-left">
                         <div style="font-size: 24px;" id="theme-icon">🌙</div>
-                        <div>
-                            <div class="card-title" id="theme-text">Темная тема</div>
-                        </div>
+                        <div><div class="card-title" id="theme-text">Темная тема</div></div>
                     </div>
                     <div class="card-right" style="color: var(--text-muted); font-size: 14px;">🔄 Сменить</div>
                 </div>
             </div>
 
-            <div class="form-section">
-                <span class="label" style="display: flex; justify-content: space-between; align-items: center;">
-                    Инструменты Реселлера
-                    <span style="color: var(--accent); font-size: 10px; background: rgba(0, 229, 255, 0.1); padding: 4px 8px; border-radius: 8px;">Telegraph</span>
-                </span>
-                
-                <div class="card" onclick="openGuide('https://telegra.ph/Tablica-razmerov-05-12', false)" style="padding: 12px 16px;">
-                    <div class="card-left">
-                        <div style="font-size: 20px;">📏</div>
-                        <div><div class="card-title" style="font-size: 14px;">Таблицы размеров</div></div>
+            <div id="reseller-tools-section" style="display: none;">
+                <div class="form-section">
+                    <span class="label" style="display: flex; justify-content: space-between; align-items: center;">
+                        Инструменты Реселлера
+                        <span style="color: var(--accent); font-size: 10px; background: rgba(0, 229, 255, 0.1); padding: 4px 8px; border-radius: 8px;">Telegraph</span>
+                    </span>
+                    
+                    <div class="card" onclick="openGuide('https://telegra.ph/Tablica-razmerov-05-12', false)" style="padding: 12px 16px;">
+                        <div class="card-left">
+                            <div style="font-size: 20px;">📏</div>
+                            <div><div class="card-title" style="font-size: 14px;">Таблицы размеров</div></div>
+                        </div>
+                        <div class="card-right" style="color: var(--text-muted);">↗</div>
                     </div>
-                    <div class="card-right" style="color: var(--text-muted);">↗</div>
-                </div>
-                <div class="card" onclick="openGuide('locked', true)" style="padding: 12px 16px;">
-                    <div class="card-left">
-                        <div style="font-size: 20px;">🔎</div>
-                        <div><div class="card-title" style="font-size: 14px; color: var(--text-main);">Легит-чек: База</div></div>
+                    <div class="card" onclick="openGuide('locked', true)" style="padding: 12px 16px;">
+                        <div class="card-left">
+                            <div style="font-size: 20px;">🔎</div>
+                            <div><div class="card-title" style="font-size: 14px; color: var(--text-main);">Легит-чек: База</div></div>
+                        </div>
+                        <div class="card-right" id="lock-legit" style="font-size: 16px;">🔒</div>
                     </div>
-                    <div class="card-right" id="lock-legit" style="font-size: 16px;">🔒</div>
-                </div>
-                <div class="card" onclick="openGuide('locked', true)" style="padding: 12px 16px; margin-bottom: 0;">
-                    <div class="card-left">
-                        <div style="font-size: 20px;">🚀</div>
-                        <div><div class="card-title" style="font-size: 14px; color: var(--text-main);">Секреты продаж Vinted</div></div>
+                    <div class="card" onclick="openGuide('locked', true)" style="padding: 12px 16px; margin-bottom: 0;">
+                        <div class="card-left">
+                            <div style="font-size: 20px;">🚀</div>
+                            <div><div class="card-title" style="font-size: 14px; color: var(--text-main);">Секреты продаж Vinted</div></div>
+                        </div>
+                        <div class="card-right" id="lock-secrets" style="font-size: 16px;">🔒</div>
                     </div>
-                    <div class="card-right" id="lock-secrets" style="font-size: 16px;">🔒</div>
                 </div>
             </div>
-
             <div class="form-section">
                 <span class="label">Интеграции</span>
-                <div class="card" style="margin-bottom: 12px; background: rgba(0, 229, 255, 0.05); border-color: rgba(0, 229, 255, 0.2);">
+                <div class="card" style="margin-bottom: 12px;" class="card-frozen">
                     <div class="card-left">
                         <div>
                             <div class="card-title" style="color: var(--accent);">API Центробанка</div>
@@ -364,7 +387,7 @@
                     </div>
                     <div class="card-right"><span class="status-dot"></span></div>
                 </div>
-                <div class="card" style="margin-bottom: 0; background: rgba(0, 229, 255, 0.05); border-color: rgba(0, 229, 255, 0.2);">
+                <div class="card" style="margin-bottom: 0;" class="card-frozen">
                     <div class="card-left">
                         <div>
                             <div class="card-title" style="color: var(--accent);">Telegraph</div>
@@ -381,6 +404,42 @@
                     💬 Написать разработчику
                 </button>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-onboarding" style="z-index: 9999; background: var(--bg-main);">
+        <div class="modal" style="height: 100vh; max-height: 100vh; border-radius: 0; padding: 40px 24px; display: flex; flex-direction: column; justify-content: center; transform: translateY(0);">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <div style="font-size: 60px; margin-bottom: 16px;">🏴‍☠️</div>
+                <h1 style="font-size: 32px; font-weight: 900; letter-spacing: -1px; margin: 0 0 10px 0;">Добро пожаловать<br>в <span style="color: var(--accent);">CultBase</span></h1>
+                <div style="color: var(--text-muted); font-size: 16px;">Твой личный терминал для ресейла.</div>
+            </div>
+            
+            <div style="flex: 1;">
+                <div class="onboarding-item">
+                    <div class="onboarding-icon">📦</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 18px; margin-bottom: 4px;">Забудь про Excel</div>
+                        <div style="color: var(--text-muted); font-size: 14px; line-height: 1.4;">Добавляй закупки в два клика. Бот сам рассчитает логистику и себестоимость товара.</div>
+                    </div>
+                </div>
+                <div class="onboarding-item">
+                    <div class="onboarding-icon">📈</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 18px; margin-bottom: 4px;">Считай чистый профит</div>
+                        <div style="color: var(--text-muted); font-size: 14px; line-height: 1.4;">Комиссии площадок вычитаются автоматически. Следи за ROI и своей реальной прибылью.</div>
+                    </div>
+                </div>
+                <div class="onboarding-item">
+                    <div class="onboarding-icon">🌍</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 18px; margin-bottom: 4px;">Мультивалютность</div>
+                        <div style="color: var(--text-muted); font-size: 14px; line-height: 1.4;">Закупай в евро или гривнах — бот сам всё переведет по актуальному курсу ЦБ.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-primary" style="padding: 20px; font-size: 18px;" onclick="closeOnboarding()">Начать работу 🚀</button>
         </div>
     </div>
 
@@ -426,7 +485,7 @@
                     <div class="form-section" style="padding: 16px;">
                         <span class="label">Площадка продажи</span>
                         <div class="input-wrapper" style="background: var(--bg-main); margin-bottom: 16px;">
-                            <select id="sell-platform">
+                            <select id="sell-platform" onchange="checkPlatformAccess(this)">
                                 <option value="none">🤝 Vinted / Direct (Без комиссии)</option>
                                 <option value="grailed">⚫️ Grailed</option>
                                 <option value="ebay">🔵 eBay</option>
@@ -511,7 +570,9 @@
                 <div class="plan-card recommended">
                     <div class="plan-badge">⭐️ Хит</div>
                     <h3 style="margin-top:0; color: var(--accent);">PRO</h3>
-                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">39 PLN <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ мес</span></div>
+                    
+                    <div id="price-pro" style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">39 PLN <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ мес</span></div>
+                    
                     <ul class="plan-features">
                         <li>Склад до 200 АКТИВНЫХ товаров</li>
                         <li>Полная аналитика, График i ROI</li>
@@ -523,7 +584,9 @@
                 </div>
                 <div class="plan-card" style="border-color: rgba(255, 215, 0, 0.4); opacity: 0.6;">
                     <h3 style="margin-top:0; color: #FFD700;">Бизнес</h3>
-                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">В разработке 🛠</div>
+                    
+                    <div id="price-biz" style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">В разработке 🛠</div>
+                    
                     <ul class="plan-features">
                         <li>Учет всех расходов (упаковка, бампы)</li>
                         <li>Глубокая Бизнес-Аналитика</li>
@@ -554,6 +617,30 @@
         let myChart = null; 
         let baseCurrency = localStorage.getItem('base_currency') || 'PLN';
 
+        // ПРОВЕРКА ОНБОРДИНГА
+        function checkOnboarding() {
+            if (!localStorage.getItem('cultbase_onboarded')) {
+                const ob = document.getElementById('modal-onboarding');
+                ob.style.display = 'flex';
+                setTimeout(() => ob.classList.add('active'), 10);
+            }
+        }
+        function closeOnboarding() {
+            localStorage.setItem('cultbase_onboarded', 'true');
+            const ob = document.getElementById('modal-onboarding');
+            ob.classList.remove('active');
+            setTimeout(() => ob.style.display = 'none', 400);
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        // ОБНОВЛЕНИЕ ЦЕН В ТАРИФАХ
+        function updateSubscriptionPrices() {
+            const proPrice = document.getElementById('price-pro');
+            if(baseCurrency === 'PLN') proPrice.innerHTML = `39 PLN <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ мес</span>`;
+            if(baseCurrency === 'EUR') proPrice.innerHTML = `9 EUR <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ мес</span>`;
+            if(baseCurrency === 'UAH') proPrice.innerHTML = `390 UAH <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ мес</span>`;
+        }
+
         async function fetchProfile() {
             try {
                 const res = await fetch(`/api/profile?user_id=${USER_ID}`);
@@ -567,6 +654,7 @@
                 if(document.getElementById('exp-cur-text')) document.getElementById('exp-cur-text').innerText = baseCurrency;
                 
                 updatePlanUI();
+                updateSubscriptionPrices();
                 loadStock(); 
             } catch(e) {}
         }
@@ -579,6 +667,8 @@
             if(document.getElementById('ship-cur-text')) document.getElementById('ship-cur-text').innerText = baseCurrency;
             if(document.getElementById('sell-cur-text')) document.getElementById('sell-cur-text').innerText = baseCurrency;
             if(document.getElementById('exp-cur-text')) document.getElementById('exp-cur-text').innerText = baseCurrency;
+            
+            updateSubscriptionPrices();
             
             if(document.getElementById('tab-stock').classList.contains('active')) loadStock();
             if(document.getElementById('tab-dash').classList.contains('active')) loadDashboard();
@@ -595,13 +685,12 @@
             const lockS = document.getElementById('lock-secrets');
             const feesInputs = document.getElementById('fees-inputs');
             const feesLock = document.getElementById('fees-lock');
+            const sellPlatformSelect = document.getElementById('sell-platform');
             const isP = (currentPlan === 'pro' || currentPlan === 'business');
             
-            // Замки гайдов
             if(lockL) { lockL.innerText = isP ? '↗' : '🔒'; lockL.style.color = isP ? 'var(--text-muted)' : 'var(--text-main)'; }
             if(lockS) { lockS.innerText = isP ? '↗' : '🔒'; lockS.style.color = isP ? 'var(--text-muted)' : 'var(--text-main)'; }
             
-            // Блок комиссий для PRO
             if(feesInputs && feesLock) {
                 if (isP) {
                     feesInputs.style.opacity = '1';
@@ -618,7 +707,18 @@
                 }
             }
 
-            // Тарифы
+            if (sellPlatformSelect) {
+                Array.from(sellPlatformSelect.options).forEach(opt => {
+                    if (opt.value !== 'none') {
+                        if (isP) {
+                            opt.text = opt.text.replace(' 🔒', '');
+                        } else {
+                            if (!opt.text.includes('🔒')) opt.text += ' 🔒';
+                        }
+                    }
+                });
+            }
+
             if(currentPlan === 'pro') {
                 b.innerText = 'PRO'; b.classList.add('pro');
                 p.innerText = 'PRO'; p.style.color = 'var(--accent)';
@@ -653,7 +753,6 @@
         function toggleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); tg.HapticFeedback.impactOccurred('light'); }
         applyTheme(currentTheme);
 
-        // Загрузка комиссий
         document.getElementById('fee-grailed').value = localStorage.getItem('fee_grailed') || '';
         document.getElementById('fee-ebay').value = localStorage.getItem('fee_ebay') || '';
         document.getElementById('fee-etsy').value = localStorage.getItem('fee_etsy') || '';
@@ -754,6 +853,11 @@
             currentSellId = id; isEditMode = false;
             document.getElementById('modal-name').innerText = name; document.getElementById('modal-cost').innerText = "Себестоимость: " + cost.toFixed(1) + " " + baseCurrency;
             if (isSold) { toggleEditMode(true); } else { document.getElementById('sell-fields').style.display = 'block'; document.getElementById('edit-fields').style.display = 'none'; document.getElementById('edit-mode-btn').innerText = '✏️'; }
+            
+            if (currentPlan === 'free') {
+                document.getElementById('sell-platform').value = 'none';
+            }
+            
             const overlay = document.getElementById('modal-sell'); overlay.style.display = 'flex'; setTimeout(() => overlay.classList.add('active'), 10); tg.HapticFeedback.impactOccurred('medium');
         }
 
@@ -787,6 +891,14 @@
                 if(modalId === 'modal-sell') { document.getElementById('sell-price').value = ''; document.getElementById('sell-platform').value = 'none'; isEditMode = false; }
                 if(modalId === 'modal-expense') { document.getElementById('exp-amount').value = ''; document.getElementById('exp-desc').value = ''; }
             }, 400);
+        }
+
+        function checkPlatformAccess(selectObj) {
+            if (selectObj.value !== 'none' && currentPlan === 'free') {
+                tg.HapticFeedback.notificationOccurred('warning');
+                selectObj.value = 'none'; 
+                openPremiumModal();       
+            }
         }
 
         async function confirmSale() {
@@ -833,7 +945,12 @@
 
         async function buySubscription(plan) {
             try {
-                const res = await fetch(`${window.location.origin}/api/invoice`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: USER_ID, plan: plan }) });
+                // ПЕРЕДАЕМ ВЫБРАННУЮ ВАЛЮТУ НА СЕРВЕР ДЛЯ ВЫСТАВЛЕНИЯ СЧЕТА
+                const res = await fetch(`${window.location.origin}/api/invoice`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ user_id: USER_ID, plan: plan, currency: baseCurrency }) 
+                });
                 if (!res.ok) throw new Error('Ошибка сети'); const data = await res.json();
                 if (data.url) { tg.openInvoice(data.url, function(status) { if (status === 'paid') { tg.HapticFeedback.notificationOccurred('success'); tg.showAlert('Оплата успешно завершена! 🎉'); closeModal('modal-premium'); fetchProfile(); } }); }
             } catch (e) { tg.showAlert('Ошибка: Сервер не отвечает.'); }
@@ -849,6 +966,8 @@
             await fetch(`/api/backup`, { method: 'POST', body: JSON.stringify({user_id: USER_ID}) }); tg.showPopup({ message: "Резервная копия отправлена в чат 📦" });
         }
 
+        // ЗАПУСК ПРИ ОТКРЫТИИ ПРИЛОЖЕНИЯ
+        checkOnboarding();
         fetchProfile();
     </script>
 </body>
